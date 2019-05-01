@@ -22,7 +22,7 @@ Message::Message(MessageSource src, MessageType type, uint8_t command, int arg)
 }
 char * Message::toCharArray(Message * message)
 {
-	char arr[TOTAL_LENGTH + 2];
+	char arr[TOTAL_LENGTH] = {0};
 	arr[0] = message->sender + MESSAGE_SHIFT;
 	arr[1] = message->type + MESSAGE_SHIFT;
 	arr[2] = message->command + MESSAGE_SHIFT;
