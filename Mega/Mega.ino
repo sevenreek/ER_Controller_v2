@@ -18,11 +18,11 @@ const static int RF_RX = 52;
 const static int RF_TX = 52;
 const static int RF_PTT = 10;
 const static bool RF_PTT_INV = false;
-BoardCoordinator * coordinator;
-CommunicationController * nanoComms;
-WirelessController * wireless;
-NeoICSerial * ICSerial;
-GPIOController * gpio;
+BoardCoordinator * coordinator = NULL;
+CommunicationController * nanoComms = NULL;
+WirelessController * wireless = NULL;
+NeoICSerial * ICSerial = NULL;
+GPIOController * gpio = NULL;
 void setup() {
 	Serial.begin(9600);
 	ICSerial = new NeoICSerial();

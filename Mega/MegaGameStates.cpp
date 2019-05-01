@@ -8,7 +8,6 @@ void GS0_EnteredCells::onUpdate()
 }
 void GS0_EnteredCells::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS0_EnteredCells::onEnd()
 {
@@ -28,7 +27,6 @@ void GS1_LockedCells::onUpdate()
 }
 void GS1_LockedCells::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS1_LockedCells::onEnd()
 {
@@ -50,7 +48,6 @@ void GS2_UnlockedCells::onUpdate()
 }
 void GS2_UnlockedCells::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS2_UnlockedCells::onEnd()
 {
@@ -73,7 +70,6 @@ void GS3_OpenedChest::onUpdate()
 }
 void GS3_OpenedChest::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS3_OpenedChest::onEnd()
 {
@@ -95,7 +91,6 @@ void GS4_LoweredCoffin::onUpdate()
 }
 void GS4_LoweredCoffin::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS4_LoweredCoffin::onEnd()
 {
@@ -116,7 +111,6 @@ void GS5_UnlockedCoffin::onMessageRecieved(Message *  message)
 {
 	if (message->sender == SNDR_COFFIN && message->type == MTYPE_STATE && message->command == CMD_COFFIN_COMPLETED)
 	{
-		delete message;
 		coordinator->loadNextInterface();
 	}
 
@@ -142,7 +136,6 @@ void GS6_SolvedCoffin::onUpdate()
 }
 void GS6_SolvedCoffin::onMessageRecieved(Message *  message)
 {
-	delete message;
 }
 void GS6_SolvedCoffin::onEnd()
 {
@@ -188,7 +181,6 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 
 			default:break;
 			}
-			delete message;
 		}
 	}
 }

@@ -12,7 +12,7 @@ void BoardCoordinator::loadInterface(int identifier)
 {
 	currentInterface->onEnd();
 	delete currentInterface;
-	GameStateInterface * newInterface;
+	GameStateInterface * newInterface = NULL;
 	currentInterfaceIndex = identifier;
 	switch (identifier)
 	{
@@ -53,6 +53,61 @@ void BoardCoordinator::loadNextInterface()
 }
 void BoardCoordinator::onUpdate()
 {
+	Message * msg = NULL;
+	if (comms->hasMessage(msg))
+	{
+		if (msg->sender == SNDR_PC)
+		{
+			if (msg->type == MTYPE_STATE)
+			{
+				switch (msg->command)
+				{
+					case CMD_NOSTATE: default:
+					break;
+					case CMD_CELLS_LOCKED:
+						loadInterface(MEGASTATE_1_LockedCells);
+					break;
+					case CMD_CELLS_UNLOCKED:
+						loadInterface(MEGASTATE_2_UnlockedCells);
+						break;
+					case CMD_CHEST_UNLOCKED:
+						loadInterface(MEGASTATE_3_OpenedChest);
+						break;
+					case CMD_COFFIN_LOWERED:
+						loadInterface(MEGASTATE_4_LoweredCoffin);
+						break;
+					case CMD_COFFIN_UNLOCKED:
+						loadInterface(MEGASTATE_5_UnlockedCoffin);
+						break;
+					case CMD_COFFIN_COMPLETED:
+						loadInterface(MEGASTATE_6_SolvedCoffin);
+						break;
+					case CMD_BOOK_TAKEN:
+						loadInterface(MEGASTATE_7_TakenBook);
+						break;
+
+				}
+			}
+			else if (msg->type == MTYPE_EVENT)
+			{
+				switch (msg->command)
+				{
+					case CMD_NOEVENT: default:
+					break;
+					case CMD_TORCH_GLOW:
+					case CMD_TORCH_DIM:
+						wireless->sendMessage(msg, WirelessController::REPEAT_COUNT);
+					break;
+					case CMD_SPELL_CAST_BEGIN:
+					case CMD_SPELL_CAST_CORRECTLY:
+						if(currentInterface)
+							currentInterface->onMessageRecieved(msg);
+					break;
+				}
+			}
+		}
+		delete msg;
+	}
 	if (currentInterface)
 		currentInterface->onUpdate();
 }
