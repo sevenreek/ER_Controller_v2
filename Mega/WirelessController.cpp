@@ -15,3 +15,20 @@ void WirelessController::sendMessage(Message *m, int repeatCount)
 		driver->waitPacketSent();
 	}
 }
+bool WirelessController::hasMessage(Message *m)
+{
+	uint8_t buffer[TOTAL_LENGTH];
+	uint8_t len = TOTAL_LENGTH;
+	if ( driver->recv(buffer, &len) )
+	{
+		if (len == TOTAL_LENGTH)
+		{
+			Message * m = new Message((char*)buffer);
+			return true;
+		}
+		else
+			return false;
+	}
+	else 
+		return false;
+}

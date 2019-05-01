@@ -1,8 +1,7 @@
 #include "BoardCoordinator.h"
-BoardCoordinator::BoardCoordinator(CommunicationController * pc, CommunicationController * mega, WirelessController * wireless, GPIOController * gpio)
+BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio)
 {
-	this->pc = pc;
-	this->pc = mega;
+	this->comms = comms;
 	this->wireless = wireless;
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
@@ -94,10 +93,6 @@ void BoardCoordinator::onUpdate()
 				switch (msg->command)
 				{
 					case CMD_NOEVENT: default:
-					break;
-					case CMD_TORCH_GLOW:
-					case CMD_TORCH_DIM:
-						wireless->sendMessage(msg, WirelessController::REPEAT_COUNT);
 					break;
 					case CMD_SPELL_CAST_BEGIN:
 					case CMD_SPELL_CAST_CORRECTLY:

@@ -42,7 +42,7 @@ private:
 public:
 	Message();
 	Message(char arr[TOTAL_LENGTH]);
-	Message::Message(MessageSource src, MessageType type, uint8_t command, int argument);
+	Message(MessageSource src, MessageType type, uint8_t command, int argument);
 	MessageSource sender;
 	MessageType type;
 	uint8_t command;
