@@ -1,7 +1,8 @@
 #include "BoardCoordinator.h"
-BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio)
+BoardCoordinator::BoardCoordinator(CommunicationController * pc, CommunicationController * mega, WirelessController * wireless, GPIOController * gpio)
 {
-	this->comms = comms;
+	this->pc = pc;
+	this->pc = mega;
 	this->wireless = wireless;
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
@@ -12,7 +13,7 @@ void BoardCoordinator::loadInterface(int identifier)
 {
 	currentInterface->onEnd();
 	delete currentInterface;
-	GameStateInterface * newInterface = NULL;
+	GameStateInterface * newInterface = 0;
 	currentInterfaceIndex = identifier;
 	switch (identifier)
 	{
@@ -53,7 +54,7 @@ void BoardCoordinator::loadNextInterface()
 }
 void BoardCoordinator::onUpdate()
 {
-	Message * msg = NULL;
+	Message * msg = 0;
 	if (comms->hasMessage(msg))
 	{
 		if (msg->sender == SNDR_PC)
