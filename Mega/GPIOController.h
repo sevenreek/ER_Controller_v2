@@ -45,8 +45,8 @@ static const int BUTTON_COUNT = 4;
 class ButtonMatrix : public GameObject {
 private:
 	static unsigned int millisPulseStart[BUTTON_COUNT];
-	static bool shouldPulse[BUTTON_COUNT];
-	unsigned int lastUpdate;
+	static uint8_t shouldPulse[BUTTON_COUNT];
+	static unsigned int lastUpdate;
 public:
 	static const int PIN_BUTTONS[BUTTON_COUNT];
 	static const int PIN_BUTTONS_PWM[BUTTON_COUNT];
@@ -63,7 +63,9 @@ public:
 	static void handleISR1();
 	static void handleISR2();
 	static void handleISR3();
-	static void pulse(int button);
+	static void pulse(int button, uint8_t count);
+	static void pulseRotate();
+	void pulseAll(uint8_t count);
 	bool isCorrect();
 	void updatePWMs();
 	void init();
@@ -83,7 +85,7 @@ private:
 	bool shouldPulse;
 	unsigned int lastUpdate;
 public:
-	static const uint8_t PIN_RELAY = 28;
+	static const uint8_t PIN_RELAY;
 	static const uint8_t PIN_RING_LARGE;
 	static const uint8_t PIN_RING_SMALL;
 	static const uint8_t PWM_LEVEL_LOW;

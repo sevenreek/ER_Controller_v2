@@ -27,6 +27,8 @@ bool CommunicationController::hasMessage(Message * message)
 }
 void CommunicationController::sendMessage(Message * message)
 {
-	stream->write(Message::toCharArray(message));
-	delete message;
+	uint8_t* arr = Message::toByteArray(message);
+	stream->write((char*)arr);
+	delete[] arr;
+	
 }

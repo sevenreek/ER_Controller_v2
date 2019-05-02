@@ -1,15 +1,18 @@
 #include "BoardCoordinator.h"
+//(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio)
 {
 	this->comms = comms;
 	this->wireless = wireless;
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
-	currentInterface = new  GS0_EnteredCells();
+	currentInterface = new  GS0_EnteredCells(this,  comms, gpio, wireless);
 	currentInterface->onStart();
 }
 void BoardCoordinator::loadInterface(int identifier)
 {
+	Serial.print("Loading new interface ");
+	Serial.println(identifier);
 	currentInterface->onEnd();
 	delete currentInterface;
 	GameStateInterface * newInterface = 0;
@@ -17,32 +20,32 @@ void BoardCoordinator::loadInterface(int identifier)
 	switch (identifier)
 	{
 		case MEGASTATE_0_EnteredCells:
-			newInterface = new GS0_EnteredCells();
+			newInterface = new GS0_EnteredCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_1_LockedCells:
-			newInterface = new GS1_LockedCells();
+			newInterface = new GS1_LockedCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_2_UnlockedCells:
-			newInterface = new GS2_UnlockedCells();
+			newInterface = new GS2_UnlockedCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_3_OpenedChest:
-			newInterface = new GS3_OpenedChest();
+			newInterface = new GS3_OpenedChest(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_4_LoweredCoffin:
-			newInterface = new GS4_LoweredCoffin();
+			newInterface = new GS4_LoweredCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_5_UnlockedCoffin:
-			newInterface = new GS5_UnlockedCoffin();
+			newInterface = new GS5_UnlockedCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_6_SolvedCoffin:
-			newInterface = new GS6_SolvedCoffin();
+			newInterface = new GS6_SolvedCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_7_TakenBook:
-			newInterface = new GS7_TakenBook();
+			newInterface = new GS7_TakenBook(this, comms, gpio, wireless);
 		break;
 
 		default:
-			newInterface = new GS_NoState();
+			newInterface = new GS_NoState(this, comms, gpio, wireless);
 		break;
 	}
 	newInterface->onStart();
@@ -102,6 +105,11 @@ void BoardCoordinator::onUpdate()
 				}
 			}
 		}
+		delete msg;
+	}
+	if (wireless->hasMessage(msg))
+	{
+		currentInterface->onMessageRecieved(msg);
 		delete msg;
 	}
 	if (currentInterface)
