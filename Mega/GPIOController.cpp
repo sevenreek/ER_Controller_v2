@@ -209,10 +209,13 @@ const uint8_t SpellRings::PIN_RING_SMALL = 2;
 const uint8_t SpellRings::PWM_LEVEL_LOW = 10;
 const uint8_t SpellRings::PWM_LEVEL_HIGH = 110;
 const uint8_t SpellRings::PWM_LEVEL_PULSE = 100;
+const uint8_t SpellRings::PIN_RELAY = 28;
 const uint8_t SpellRings::UPDATE_DELAY = 15;
 const unsigned int SpellRings::PWM_PULSE_TIME = 7000;
 void SpellRings::init()
 {
+	pinMode(PIN_RELAY, OUTPUT);
+	digitalWrite(PIN_RELAY, LOW);
 	pinMode(PIN_RING_LARGE, OUTPUT);
 	pinMode(PIN_RING_SMALL, OUTPUT);
 	analogWrite(PIN_RING_SMALL, 0.25f*PWM_LEVEL_LOW);

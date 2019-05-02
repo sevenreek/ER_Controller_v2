@@ -83,6 +83,7 @@ private:
 	bool shouldPulse;
 	unsigned int lastUpdate;
 public:
+	static const uint8_t PIN_RELAY = 28;
 	static const uint8_t PIN_RING_LARGE;
 	static const uint8_t PIN_RING_SMALL;
 	static const uint8_t PWM_LEVEL_LOW;
