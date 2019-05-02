@@ -64,6 +64,7 @@ bool Coffin::open(WirelessController * wireless)
 	int arg = 0;
 	Message * m = new Message(SNDR_MEGA, MTYPE_EVENT, command, arg);
 	wireless->sendMessage(m, WirelessController::REPEAT_COUNT);
+	delete m;
 }
 // END COFFIN
 
