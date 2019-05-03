@@ -1,0 +1,16 @@
+/* An eleborate library for controlling an examplatory Escape Room. 
+ * 
+ * Copyright (c) 2019 Wojciech Walewski, w.walewski112@gmail.com
+ *
+ * This version of software is distributed under the
+ * Attribution-NonCommercial 3.0 Unported (CC BY-NC 3.0) license:
+ * https://creativecommons.org/licenses/by-nc/3.0/legalcode
+ * You are free to share and adapt this material, provided
+ * it is not performed for commercial use. For commercial
+ * licensing contact me at w.walewski112@gmail.com.
+ * These assumptions exclude the used set of Arduino libraries:
+ * RadioHead(https://www.airspayce.com/mikem/arduino/RadioHead/), 
+ * NeoICSerial(https://github.com/SlashDevin/NeoICSerial), 
+ * SPI, Serial and other libraries(https://github.com/arduino/ArduinoCore-avr/) 
+ * mostly published under GNU General Public License version 2 or similar
+ */

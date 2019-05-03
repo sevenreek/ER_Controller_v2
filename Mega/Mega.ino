@@ -33,11 +33,12 @@ void setup() {
 	gpio = new GPIOController();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
-	//coordinator->loadInterface(5);
+	coordinator->loadInterface(7);
 	Serial.println("Succesfully started.");
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+	//Serial.println("Update");
 	coordinator->onUpdate();
 }

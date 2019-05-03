@@ -3,7 +3,7 @@
 static const int ARGUMENT_LENGTH = 4;
 static const int PREAMBLE_LENGTH = 2; // MessageSource + MessageType
 static const int COMMAND_LENGTH = 1;
-static const int POSTAMBLE_LENGTH = 2; // \n\0
+static const int POSTAMBLE_LENGTH = 1; // \n
 static const int TOTAL_LENGTH = PREAMBLE_LENGTH + COMMAND_LENGTH + ARGUMENT_LENGTH + POSTAMBLE_LENGTH;
 static const uint8_t MESSAGE_SHIFT = 0x30; // messages are shifted by hex 0x30 since 0 is \0 and 10 is new line etc.
 enum MessageType {

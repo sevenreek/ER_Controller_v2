@@ -61,6 +61,7 @@ void BoardCoordinator::onUpdate()
 	{
 		if (msg->sender == SNDR_PC)
 		{
+			Serial.println("PC sent something");
 			if (msg->type == MTYPE_STATE)
 			{
 				switch (msg->command)
@@ -93,12 +94,15 @@ void BoardCoordinator::onUpdate()
 			}
 			else if (msg->type == MTYPE_EVENT)
 			{
+				
 				switch (msg->command)
 				{
 					case CMD_NOEVENT: default:
 					break;
 					case CMD_SPELL_CAST_BEGIN:
 					case CMD_SPELL_CAST_CORRECTLY:
+						Serial.print("pointer passed:");
+						Serial.println((int)msg);
 						if(currentInterface)
 							currentInterface->onMessageRecieved(msg);
 					break;

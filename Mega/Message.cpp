@@ -35,6 +35,7 @@ uint8_t* Message::toByteArray(Message * message)
 {
 
 	uint8_t* arr = new uint8_t[TOTAL_LENGTH];
+	memset(arr, 0, TOTAL_LENGTH * sizeof(uint8_t));
 	arr[0] = (uint8_t)message->sender + MESSAGE_SHIFT;
 
 	arr[1] = (uint8_t)message->type + MESSAGE_SHIFT;
@@ -43,8 +44,7 @@ uint8_t* Message::toByteArray(Message * message)
 
 	message->argument %= 9999;
 	snprintf((char*)(arr + PREAMBLE_LENGTH + COMMAND_LENGTH), ARGUMENT_LENGTH, "%d", message->argument);
-	arr[TOTAL_LENGTH - 2] = '\n';
-	arr[TOTAL_LENGTH - 1] = '\0';
+	arr[TOTAL_LENGTH - 1] = '\n';
 
 	return arr;
 }

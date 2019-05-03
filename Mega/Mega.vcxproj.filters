@@ -16,6 +16,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Mega.ino" />
+    <None Include="License">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Mega.vsarduino.h">
