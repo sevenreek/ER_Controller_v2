@@ -15,7 +15,7 @@ void GS0_EnteredCells::onUpdate()
 {
 	if (gpio->cells.areLocked())
 	{
-		Serial.println("Cells are locked");
+		//Serial.println("Cells are locked");
 		coordinator->loadNextInterface();
 	}
 }
@@ -245,26 +245,26 @@ void GS7_TakenBook::onUpdate()
 }
 void GS7_TakenBook::onMessageRecieved(Message *  message)
 {
-	Serial.println("Recieved message");
-	Serial.print("pointer recieved:");
-	Serial.println((int)message);
+	//Serial.println("Recieved message");
+	//Serial.print("pointer recieved:");
+	//Serial.println((int)message);
 	if (message->sender == SNDR_PC && message->type == MTYPE_EVENT)
 	{
-		Serial.println("Event coming from PC recognized.");
-		Serial.print("Command is "); Serial.println(message->command);
+		//Serial.println("Event coming from PC recognized.");
+		//Serial.print("Command is "); Serial.println(message->command);
 		if (message->command == CMD_SPELL_CAST_BEGIN)
 		{
 			gpio->rings.pulse();
 		}
 		else if (message->command == CMD_SPELL_CAST_CORRECTLY)
 		{
-			Serial.println("Recieved spellcastcorrect");
+			//Serial.println("Recieved spellcastcorrect");
 			switch (message->argument)
 			{
 
 			case 0: // spell 0 no need to send sounds as the message is sourced from PC
 				gpio->devil.lightLed();
-				Serial.println("Recieved first spell");
+				//Serial.println("Recieved first spell");
 				break;
 			case 1: // spell 1
 

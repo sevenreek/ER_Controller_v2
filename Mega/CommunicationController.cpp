@@ -7,7 +7,7 @@ bool CommunicationController::hasMessage(Message * &message)
 {
 	while (stream->available())
 	{
-
+		
 		char readChar = stream->read();
 		//Serial.print(readChar, HEX);
 		//Serial.print(' ');

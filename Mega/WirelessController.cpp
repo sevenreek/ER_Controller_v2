@@ -3,19 +3,19 @@
 WirelessController::WirelessController(int speed, int rx, int tx, int ptt, bool ptt_inv)
 {
 	driver = new RH_ASK(speed, rx, tx, ptt, ptt_inv);
-	Serial.print("Initialized with ");Serial.print(speed);
-	Serial.print(rx);Serial.print(tx);Serial.println(ptt);
+	//Serial.print("Initialized with ");Serial.print(speed);
+	//Serial.print(rx);Serial.print(tx);Serial.println(ptt);
 	driver->init();
 }
 void WirelessController::sendMessage(Message *m, int repeatCount)
 {
 	uint8_t * mes = Message::toByteArray(m);
-	Serial.print("Sending:");
-	Serial.println((char*)mes);
+	//Serial.print("Sending:");
+	//Serial.println((char*)mes);
 	uint8_t len = TOTAL_LENGTH-1;
 	while (repeatCount--)
 	{
-		Serial.print("Called send...");
+		//Serial.print("Called send...");
 		driver->send(mes,len);
 		driver->waitPacketSent();
 	}
