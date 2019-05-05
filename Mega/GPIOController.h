@@ -44,9 +44,9 @@ static const int SEQUENCE_LENGTH = 6;
 static const int BUTTON_COUNT = 4;
 class ButtonMatrix : public GameObject {
 private:
-	static unsigned int millisPulseStart[BUTTON_COUNT];
+	static unsigned long millisPulseStart[BUTTON_COUNT];
 	static uint8_t shouldPulse[BUTTON_COUNT];
-	static unsigned int lastUpdate;
+	static unsigned long lastUpdate;
 public:
 	static const int PIN_BUTTONS[BUTTON_COUNT];
 	static const int PIN_BUTTONS_PWM[BUTTON_COUNT];

@@ -6,6 +6,7 @@ CommunicationController::CommunicationController(Stream * stream)
 }
 void CommunicationController::flushBuffer()
 {
+	Serial.println("Flushing...");
 	pos = 0;
 	memset(messageArray, 0, TOTAL_LENGTH);
 }
@@ -21,6 +22,7 @@ bool CommunicationController::hasMessage(Message * &message)
 		//Serial.print(' ');
 		if (readChar == '\n')
 		{
+			Serial.print("pos = "); Serial.println(pos);
 			message = Message::fromByteArray(messageArray);
 			//Serial.print("Returning pointer: "); Serial.println((int)message);
 			flushBuffer();
