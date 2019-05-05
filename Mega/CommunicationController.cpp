@@ -1,13 +1,21 @@
 #include "CommunicationController.h"
+const unsigned int CommunicationController::MESSAGE_TIMEOUT = 2500;
 CommunicationController::CommunicationController(Stream * stream)
 {
 	this->stream = stream;
 }
+void CommunicationController::flushBuffer()
+{
+	pos = 0;
+	memset(messageArray, 0, TOTAL_LENGTH);
+}
 bool CommunicationController::hasMessage(Message * &message)
 {
+	if(pos > 0 && lastRecieved + MESSAGE_TIMEOUT < millis())
+		flushBuffer();
 	while (stream->available())
 	{
-		
+		lastRecieved = millis();
 		char readChar = stream->read();
 		//Serial.print(readChar, HEX);
 		//Serial.print(' ');
@@ -15,14 +23,16 @@ bool CommunicationController::hasMessage(Message * &message)
 		{
 			message = Message::fromByteArray(messageArray);
 			//Serial.print("Returning pointer: "); Serial.println((int)message);
-			pos = 0;
-			memset(messageArray, 0, TOTAL_LENGTH * sizeof(uint8_t));
+			flushBuffer();
 			return true;
 		}
 		else if (pos >= TOTAL_LENGTH)
 		{
-			pos = 0;
-			memset(messageArray, 0, TOTAL_LENGTH);
+			flushBuffer();
+		}
+		else if (pos < 3 && !isAlphaNumeric(readChar))
+		{
+			flushBuffer();
 		}
 		else
 		{

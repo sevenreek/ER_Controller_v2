@@ -4,10 +4,10 @@
 class GameStateInterface;
 class BoardCoordinator {
 private:
-	GameStateInterface * currentInterface;
-	CommunicationController * comms;
-	WirelessController * wireless;
-	GPIOController * gpio;
+	GameStateInterface * currentInterface = NULL;
+	CommunicationController * comms = NULL;
+	WirelessController * wireless = NULL;
+	GPIOController * gpio = NULL;
 	unsigned int currentInterfaceIndex;
 public:
 	BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio);

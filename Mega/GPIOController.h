@@ -33,7 +33,7 @@ public:
 	static const int ROTATIONS_TO_LOWER;
 	static const int DEBOUNCE_TIME;
 	static unsigned int rotationCount;
-	static unsigned int debouncer;
+	static unsigned long debouncer;
 	static void handleISR();
 	void init();
 	void free();
@@ -58,11 +58,13 @@ public:
 	static const uint8_t UPDATE_DELAY;
 	static uint8_t sequence[SEQUENCE_LENGTH];
 	static uint8_t position;
-	static unsigned int buttonDebouncers[BUTTON_COUNT];
+	static unsigned long buttonDebouncers[BUTTON_COUNT];
 	static void handleISR0();
 	static void handleISR1();
 	static void handleISR2();
 	static void handleISR3();
+	static void enableISR();
+	static void disableISR();
 	static void pulse(int button, uint8_t count);
 	static void pulseRotate();
 	void pulseAll(uint8_t count);
@@ -83,7 +85,7 @@ public:
 class SpellRings : public GameObject {
 private:
 	bool shouldPulse;
-	unsigned int lastUpdate;
+	unsigned long lastUpdate;
 public:
 	static const uint8_t PIN_RELAY;
 	static const uint8_t PIN_RING_LARGE;
@@ -91,9 +93,10 @@ public:
 	static const uint8_t PWM_LEVEL_LOW;
 	static const uint8_t PWM_LEVEL_HIGH;
 	static const uint8_t PWM_LEVEL_PULSE;
+	static const uint8_t PULSE_COUNT;
 	static const uint8_t UPDATE_DELAY;
 	static const unsigned int PWM_PULSE_TIME;
-	unsigned int pulseStartMillis;
+	unsigned long pulseStartMillis;
 	void init();
 	void free();
 	void dim();

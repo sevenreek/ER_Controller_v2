@@ -11,6 +11,7 @@ enum MegaStates {
 	MEGASTATE_5_UnlockedCoffin,
 	MEGASTATE_6_SolvedCoffin,
 	MEGASTATE_7_TakenBook,
+	MEGASTATE_R_RestoreRoom,
 };
 class GS_NoState : public GameStateInterface {
 public:

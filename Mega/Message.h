@@ -29,6 +29,7 @@ enum StateCommands {
 	CMD_COFFIN_COMPLETED,
 	CMD_HANGMAN_DOWN,
 	CMD_BOOK_TAKEN,
+	CMD_RESTORE_ROOM,
 };
 enum EventCommands {
 	CMD_NOEVENT,

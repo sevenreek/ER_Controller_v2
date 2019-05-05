@@ -13,9 +13,10 @@ void GS0_EnteredCells::onStart()
 }
 void GS0_EnteredCells::onUpdate()
 {
+	//Serial.println("Interface onUpdate");
 	if (gpio->cells.areLocked())
 	{
-		//Serial.println("Cells are locked");
+		Serial.println("Cells are locked");
 		coordinator->loadNextInterface();
 	}
 }
@@ -241,7 +242,7 @@ void GS7_TakenBook::onStart()
 }
 void GS7_TakenBook::onUpdate()
 {
-
+	gpio->rings.updatePWMs(); 
 }
 void GS7_TakenBook::onMessageRecieved(Message *  message)
 {
@@ -322,17 +323,18 @@ GSR_RestoreRoom::GSR_RestoreRoom(BoardCoordinator* coordinator, CommunicationCon
 void GSR_RestoreRoom::onStart()
 {
 	Serial.println("Restoring room state!");
+	gpio->devil.beginMoveDown();
 }
 void GSR_RestoreRoom::onUpdate()
 {
-	Serial.println("ERROR: NoState updated!");
+	
 }
 void GSR_RestoreRoom::onMessageRecieved(Message *  message)
 {
-	Serial.println("ERROR: NoState recieved message!");
+	
 }
 void GSR_RestoreRoom::onEnd()
 {
-	Serial.println("ERROR: NoState ended!");
+	
 }
 // END GSR_RestoreRoom

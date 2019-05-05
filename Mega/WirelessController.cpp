@@ -10,6 +10,10 @@ WirelessController::WirelessController(int speed, int rx, int tx, int ptt, bool 
 void WirelessController::sendMessage(Message *m, int repeatCount)
 {
 	uint8_t * mes = Message::toByteArray(m);
+	for (int i = 0; i < TOTAL_LENGTH - 1; i++)
+	{
+		Serial.print(mes[i]);Serial.print(" ");
+	}
 	//Serial.print("Sending:");
 	//Serial.println((char*)mes);
 	uint8_t len = TOTAL_LENGTH-1;

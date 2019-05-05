@@ -2,53 +2,58 @@
 //(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio)
 {
+	//Serial.println("Board coordinator loaded.");
+	//delay(1000);
 	this->comms = comms;
 	this->wireless = wireless;
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
-	currentInterface = new  GS0_EnteredCells(this,  comms, gpio, wireless);
-	currentInterface->onStart();
+	loadInterface(0);
 }
 void BoardCoordinator::loadInterface(int identifier)
 {
-	Serial.print("Loading new interface ");
+	Serial.print("Loading interface ");
 	Serial.println(identifier);
-	currentInterface->onEnd();
-	delete currentInterface;
-	GameStateInterface * newInterface = 0;
+	if (currentInterface)
+	{
+		currentInterface->onEnd();
+		delete currentInterface;
+	}
 	currentInterfaceIndex = identifier;
 	switch (identifier)
 	{
 		case MEGASTATE_0_EnteredCells:
-			newInterface = new GS0_EnteredCells(this, comms, gpio, wireless);
+			currentInterface = new GS0_EnteredCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_1_LockedCells:
-			newInterface = new GS1_LockedCells(this, comms, gpio, wireless);
+			currentInterface = new GS1_LockedCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_2_UnlockedCells:
-			newInterface = new GS2_UnlockedCells(this, comms, gpio, wireless);
+			currentInterface = new GS2_UnlockedCells(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_3_OpenedChest:
-			newInterface = new GS3_OpenedChest(this, comms, gpio, wireless);
+			currentInterface = new GS3_OpenedChest(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_4_LoweredCoffin:
-			newInterface = new GS4_LoweredCoffin(this, comms, gpio, wireless);
+			currentInterface = new GS4_LoweredCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_5_UnlockedCoffin:
-			newInterface = new GS5_UnlockedCoffin(this, comms, gpio, wireless);
+			currentInterface = new GS5_UnlockedCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_6_SolvedCoffin:
-			newInterface = new GS6_SolvedCoffin(this, comms, gpio, wireless);
+			currentInterface = new GS6_SolvedCoffin(this, comms, gpio, wireless);
 		break;
 		case MEGASTATE_7_TakenBook:
-			newInterface = new GS7_TakenBook(this, comms, gpio, wireless);
+			currentInterface = new GS7_TakenBook(this, comms, gpio, wireless);
 		break;
-
+		case MEGASTATE_R_RestoreRoom:
+			currentInterface = new GSR_RestoreRoom(this, comms, gpio, wireless);
+		break;
 		default:
-			newInterface = new GS_NoState(this, comms, gpio, wireless);
+			currentInterface = new GS_NoState(this, comms, gpio, wireless);
 		break;
 	}
-	newInterface->onStart();
+	currentInterface->onStart();
 }
 void BoardCoordinator::loadNextInterface()
 {
@@ -89,7 +94,9 @@ void BoardCoordinator::onUpdate()
 					case CMD_BOOK_TAKEN:
 						loadInterface(MEGASTATE_7_TakenBook);
 						break;
-
+					case CMD_RESTORE_ROOM:
+						loadInterface(MEGASTATE_R_RestoreRoom);
+						break;
 				}
 			}
 			else if (msg->type == MTYPE_EVENT)
@@ -116,6 +123,8 @@ void BoardCoordinator::onUpdate()
 		currentInterface->onMessageRecieved(msg);
 		delete msg;
 	}
+	//Serial.print("Update coordinator");
+	//Serial.println((int)currentInterface);
 	if (currentInterface)
 		currentInterface->onUpdate();
 }
