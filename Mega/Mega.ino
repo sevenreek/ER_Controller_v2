@@ -33,7 +33,7 @@ void setup() {
 	gpio = new GPIOController();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
-	//coordinator->loadInterface(MEGASTATE_7_TakenBook);
+	//coordinator->loadInterface(MEGASTATE_4_LoweredCoffin);
 	
 	Serial.println("Succesfully started.");
 }

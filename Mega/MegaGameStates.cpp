@@ -16,7 +16,7 @@ void GS0_EnteredCells::onUpdate()
 	//Serial.println("Interface onUpdate");
 	if (gpio->cells.areLocked())
 	{
-		Serial.println("Cells are locked");
+		//Serial.println("Cells are locked");
 		coordinator->loadNextInterface();
 	}
 }
@@ -43,7 +43,7 @@ void GS1_LockedCells::onStart()
 }
 void GS1_LockedCells::onUpdate()
 {
-	if (!gpio->cells.areLocked())
+	if (gpio->cells.areUnlocked())
 	{
 		coordinator->loadNextInterface();
 	}
@@ -134,6 +134,7 @@ void GS4_LoweredCoffin::onStart()
 }
 void GS4_LoweredCoffin::onUpdate()
 {
+	
 	gpio->buttons.updatePWMs();
 	if (gpio->buttons.position >= SEQUENCE_LENGTH)
 	{
@@ -190,7 +191,7 @@ void GS5_UnlockedCoffin::onMessageRecieved(Message *  message)
 }
 void GS5_UnlockedCoffin::onEnd()
 {
-
+	gpio->buttons.free();
 }
 // END GS5_UnlockedCoffin
 // GS6_SolvedCoffin

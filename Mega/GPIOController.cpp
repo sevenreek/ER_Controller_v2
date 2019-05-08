@@ -16,6 +16,11 @@ bool Cells::areLocked()
 	//Serial.print(digitalRead(PIN_CELL0));Serial.println(digitalRead(PIN_CELL1));
 	return (digitalRead(PIN_CELL0) == LOW && digitalRead(PIN_CELL1) == LOW);
 }
+bool Cells::areUnlocked()
+{
+	//Serial.print(digitalRead(PIN_CELL0));Serial.println(digitalRead(PIN_CELL1));
+	return (digitalRead(PIN_CELL0) == HIGH && digitalRead(PIN_CELL1) == HIGH);
+}
 // END CELLS
 // CHEST
 const uint8_t Chest::PIN_CHEST_REED = A14;
@@ -33,7 +38,7 @@ bool Chest::isLocked()
 }
 // END CHEST
 // COFFIN
-const int Coffin::PIN_CRANK_REED = A15;
+const uint8_t Coffin::PIN_CRANK_REED = A15;
 const int Coffin::ROTATIONS_TO_LOWER = 10;
 const int Coffin::DEBOUNCE_TIME = 100;
 unsigned int Coffin::rotationCount = 0;
@@ -45,7 +50,7 @@ void Coffin::init()
 }
 void Coffin::handleISR()
 {
-	Serial.println("Coffin ISR");
+	//Serial.println("Coffin ISR");
 	if ( (digitalRead(PIN_CRANK_REED) == LOW) && ( (debouncer + DEBOUNCE_TIME) < millis() ) )
 	{
 		debouncer = millis();
@@ -58,7 +63,7 @@ void Coffin::free()
 }
 bool Coffin::isLowered()
 {
-	Serial.print(rotationCount);Serial.print('/');Serial.println(ROTATIONS_TO_LOWER);
+	//Serial.print(rotationCount);Serial.print('/');Serial.println(ROTATIONS_TO_LOWER);
 	return (rotationCount >= ROTATIONS_TO_LOWER);
 }
 bool Coffin::open(WirelessController * wireless)
@@ -73,12 +78,12 @@ bool Coffin::open(WirelessController * wireless)
 
 
 // BUTTONMATRIX
-unsigned int ButtonMatrix::millisPulseStart[BUTTON_COUNT] = {0};
+unsigned long ButtonMatrix::millisPulseStart[BUTTON_COUNT] = {0};
 uint8_t ButtonMatrix::shouldPulse[BUTTON_COUNT] = {0};
-unsigned int ButtonMatrix::lastUpdate = 0;
+unsigned long ButtonMatrix::lastUpdate = 0;
 const uint8_t ButtonMatrix::CORRECT_SEQUENCE[SEQUENCE_LENGTH] = { 3,4,1,2,2,4 };//{4,4,4,4,4,4};
-const int ButtonMatrix::PIN_BUTTONS[BUTTON_COUNT] = {A13,A12,A11,A10};
-const int ButtonMatrix::PIN_BUTTONS_PWM[BUTTON_COUNT] = {5,6,7,4};
+const uint8_t ButtonMatrix::PIN_BUTTONS[BUTTON_COUNT] = {A13,A12,A11,A10};
+const uint8_t ButtonMatrix::PIN_BUTTONS_PWM[BUTTON_COUNT] = {5,6,7,4};
 const unsigned int ButtonMatrix::PULSE_DURATION = 200;
 const unsigned int ButtonMatrix::DEBOUNCE_TIME = 500;
 const uint8_t ButtonMatrix::UPDATE_DELAY = 15;
@@ -105,26 +110,24 @@ void ButtonMatrix::free()
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[1]));
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[2]));
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[3]));
+	for (int i = 0; i < BUTTON_COUNT; i++)
+	{
+		analogWrite(PIN_BUTTONS_PWM[i], 0);
+	}
 }
 bool ButtonMatrix::isCorrect()
 {
-	Serial.print(CORRECT_SEQUENCE[0]);Serial.print(" vs. ");Serial.print(sequence[0]);Serial.println();
-	Serial.print(CORRECT_SEQUENCE[1]);Serial.print(" vs. ");Serial.print(sequence[1]);Serial.println();
-	Serial.print(CORRECT_SEQUENCE[2]);Serial.print(" vs. ");Serial.print(sequence[2]);Serial.println();
-	Serial.print(CORRECT_SEQUENCE[3]);Serial.print(" vs. ");Serial.print(sequence[3]);Serial.println();
-	Serial.print(CORRECT_SEQUENCE[4]);Serial.print(" vs. ");Serial.print(sequence[4]);Serial.println();
-	Serial.print(CORRECT_SEQUENCE[5]);Serial.print(" vs. ");Serial.print(sequence[5]);Serial.println();
 	if (memcmp(sequence, CORRECT_SEQUENCE, sizeof(uint8_t)*SEQUENCE_LENGTH) == 0)
 	{
-		Serial.println("Correct button sequence detected");
+		//Serial.println("Correct button sequence detected");
 		return true;
 	}
 	return false;
 }
 void ButtonMatrix::updatePWMs()
 {
-	if (lastUpdate + UPDATE_DELAY < millis())
-	{
+	//if (lastUpdate + UPDATE_DELAY < millis())
+	//{
 		for (int i = 0; i < BUTTON_COUNT; i++)
 		{
 			if (shouldPulse[i])
@@ -144,7 +147,7 @@ void ButtonMatrix::updatePWMs()
 				analogWrite(PIN_BUTTONS_PWM[i], BASE_LEVEL);
 		}
 		lastUpdate = millis();
-	}
+	//}
 }
 void ButtonMatrix::pulse(int button, uint8_t count)
 {
@@ -188,9 +191,12 @@ void ButtonMatrix::pulseRotate()
 }
 void ButtonMatrix::handleISR0()
 {
-	disableISR();
+	
+	Serial.println("0");
 	if (buttonDebouncers[0] + DEBOUNCE_TIME < millis() && digitalRead(PIN_BUTTONS[0])==LOW)
 	{
+		buttonDebouncers[0] = millis();
+		Serial.println("0!");
 		Serial.print(buttonDebouncers[0]);Serial.print('+');Serial.print(DEBOUNCE_TIME);Serial.print('<');Serial.println(millis());
 		if (position < SEQUENCE_LENGTH)
 		{
@@ -198,14 +204,17 @@ void ButtonMatrix::handleISR0()
 			pulse(0,1);
 		}
 	}
-	enableISR();
-	buttonDebouncers[0] = millis();
+	
+	
 }
 void ButtonMatrix::handleISR1()
 {
-	disableISR();
+	
+	Serial.println("1");
 	if (buttonDebouncers[1] + DEBOUNCE_TIME < millis() && digitalRead(PIN_BUTTONS[1]) == LOW)
 	{
+		buttonDebouncers[1] = millis();
+		Serial.println("1!");
 		Serial.print(buttonDebouncers[1]);Serial.print('+');Serial.print(DEBOUNCE_TIME);Serial.print('<');Serial.println(millis());
 		if (position < SEQUENCE_LENGTH)
 		{
@@ -214,14 +223,16 @@ void ButtonMatrix::handleISR1()
 		}
 		
 	}
-	enableISR();
-	buttonDebouncers[1] = millis();
+	
+	
 }
 void ButtonMatrix::handleISR2()
 {
-	disableISR();
+	Serial.println("2");
 	if (buttonDebouncers[2] + DEBOUNCE_TIME < millis() && digitalRead(PIN_BUTTONS[2]) == LOW)
 	{
+		buttonDebouncers[2] = millis();
+		Serial.println("2!");
 		Serial.print(buttonDebouncers[2]);Serial.print('+');Serial.print(DEBOUNCE_TIME);Serial.print('<');Serial.println(millis());
 		if (position < SEQUENCE_LENGTH)
 		{
@@ -230,14 +241,15 @@ void ButtonMatrix::handleISR2()
 		}
 		
 	}
-	enableISR();
-	buttonDebouncers[2] = millis();
+	
 }
 void ButtonMatrix::handleISR3()
 {
-	disableISR();
+	Serial.println("3");
 	if (buttonDebouncers[3] + DEBOUNCE_TIME < millis() && digitalRead(PIN_BUTTONS[3]) == LOW)
 	{
+		buttonDebouncers[3] = millis();
+		Serial.println("3!");
 		Serial.print(buttonDebouncers[3]);Serial.print('+');Serial.print(DEBOUNCE_TIME);Serial.print('<');Serial.println(millis());
 		if (position < SEQUENCE_LENGTH)
 		{
@@ -245,8 +257,7 @@ void ButtonMatrix::handleISR3()
 			pulse(3,1);
 		}
 	}
-	enableISR();
-	buttonDebouncers[3] = millis();
+	
 }
 // END BUTTONMATRIX
 // HANGMAN

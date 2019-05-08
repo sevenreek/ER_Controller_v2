@@ -88,7 +88,7 @@ void BoardCoordinator::onUpdate()
 					case CMD_COFFIN_UNLOCKED:
 						loadInterface(MEGASTATE_5_UnlockedCoffin);
 						break;
-					case CMD_COFFIN_COMPLETED:
+					case CMD_COFFIN_COMPLETED: case CMD_HANGMAN_DOWN:
 						loadInterface(MEGASTATE_6_SolvedCoffin);
 						break;
 					case CMD_BOOK_TAKEN:
