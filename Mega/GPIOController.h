@@ -16,6 +16,7 @@ public:
 	void init();
 	void free();
 	bool areLocked();
+	bool areUnlocked();
 };
 class Chest : public GameObject {
 private:
@@ -29,7 +30,7 @@ public:
 class Coffin : public GameObject {
 private:
 public:
-	static const int PIN_CRANK_REED;
+	static const uint8_t PIN_CRANK_REED;
 	static const int ROTATIONS_TO_LOWER;
 	static const int DEBOUNCE_TIME;
 	static unsigned int rotationCount;
@@ -44,12 +45,12 @@ static const int SEQUENCE_LENGTH = 6;
 static const int BUTTON_COUNT = 4;
 class ButtonMatrix : public GameObject {
 private:
-	static unsigned int millisPulseStart[BUTTON_COUNT];
+	static unsigned long millisPulseStart[BUTTON_COUNT];
 	static uint8_t shouldPulse[BUTTON_COUNT];
-	static unsigned int lastUpdate;
+	static unsigned long lastUpdate;
 public:
-	static const int PIN_BUTTONS[BUTTON_COUNT];
-	static const int PIN_BUTTONS_PWM[BUTTON_COUNT];
+	static const uint8_t PIN_BUTTONS[BUTTON_COUNT];
+	static const uint8_t PIN_BUTTONS_PWM[BUTTON_COUNT];
 	static const uint8_t CORRECT_SEQUENCE[SEQUENCE_LENGTH];
 	static const uint8_t BASE_LEVEL;
 	static const uint8_t PULSE_LEVEL;
