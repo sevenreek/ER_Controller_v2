@@ -1,5 +1,6 @@
 #include "CommunicationController.h"
 const unsigned int CommunicationController::MESSAGE_TIMEOUT = 2500;
+const char CommunicationController::FLUSHING_CHARACTER = 127;
 CommunicationController::CommunicationController(Stream * stream)
 {
 	this->stream = stream;
@@ -9,6 +10,11 @@ void CommunicationController::flushBuffer()
 	Serial.println("Flushing...");
 	pos = 0;
 	memset(messageArray, 0, TOTAL_LENGTH);
+}
+
+void CommunicationController::pushCommsCleaner()
+{
+	stream->write(FLUSHING_CHARACTER);
 }
 bool CommunicationController::hasMessage(Message * &message)
 {
@@ -28,6 +34,10 @@ bool CommunicationController::hasMessage(Message * &message)
 			flushBuffer();
 			return true;
 		}
+		else if (readChar == FLUSHING_CHARACTER)
+		{
+			flushBuffer();
+		}
 		else if (pos >= TOTAL_LENGTH)
 		{
 			flushBuffer();
@@ -45,6 +55,7 @@ bool CommunicationController::hasMessage(Message * &message)
 }
 void CommunicationController::sendMessage(Message * message)
 {
+	stream->write(FLUSHING_CHARACTER);
 	uint8_t* arr = Message::toByteArray(message);
 	/*Serial.println("Writing:");
 	for (int i = 0; i < TOTAL_LENGTH; i++)

@@ -40,12 +40,17 @@ void GS1_LockedCells::onStart()
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_LOCKED, 0);
 	comms->sendMessage(m);
 	delete m;
+	gpio->chest.init();
 }
 void GS1_LockedCells::onUpdate()
 {
 	if (gpio->cells.areUnlocked())
 	{
 		coordinator->loadNextInterface();
+	}
+	if (!gpio->chest.isLocked())
+	{
+		coordinator->loadInterface(MEGASTATE_3_OpenedChest);
 	}
 }
 void GS1_LockedCells::onMessageRecieved(Message *  message)
@@ -69,7 +74,7 @@ void GS2_UnlockedCells::onStart()
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_UNLOCKED, 0);
 	comms->sendMessage(m);
 	delete m;
-	gpio->chest.init();
+	
 }
 void GS2_UnlockedCells::onUpdate()
 {
@@ -328,7 +333,7 @@ void GSR_RestoreRoom::onStart()
 }
 void GSR_RestoreRoom::onUpdate()
 {
-	
+	Serial.println(digitalRead(gpio->hangman.PIN_BOOK_REED) == LOW ? "BOOK DETECTED" : "NO BOOK");
 }
 void GSR_RestoreRoom::onMessageRecieved(Message *  message)
 {

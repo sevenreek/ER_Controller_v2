@@ -7,10 +7,12 @@ private:
 	uint8_t messageArray[TOTAL_LENGTH];
 	unsigned int pos;
 	unsigned long lastRecieved;
+	static const char FLUSHING_CHARACTER;
 public:
 	static const unsigned int MESSAGE_TIMEOUT;
 	CommunicationController(Stream * stream);
 	bool hasMessage(Message *& msg);
 	void sendMessage(Message * msg);
 	void flushBuffer();
+	void pushCommsCleaner();
 };
