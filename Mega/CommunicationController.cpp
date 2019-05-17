@@ -24,8 +24,8 @@ bool CommunicationController::hasMessage(Message * &message)
 	{
 		lastRecieved = millis();
 		char readChar = stream->read();
-		//Serial.print(readChar, HEX);
-		//Serial.print(' ');
+		Serial.print(readChar, HEX);
+		Serial.print(' ');
 		if (readChar == '\n')
 		{
 			Serial.print("pos = "); Serial.println(pos);
