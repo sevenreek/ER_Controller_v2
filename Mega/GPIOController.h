@@ -31,10 +31,14 @@ class Coffin : public GameObject {
 private:
 public:
 	static const uint8_t PIN_CRANK_REED;
-	static const int ROTATIONS_TO_LOWER;
-	static const int DEBOUNCE_TIME;
-	static unsigned int rotationCount;
+	static const uint16_t ROTATIONS_TO_LOWER;
+	static const uint16_t ROTATIONS_TO_LOWER_POSSIBLE;
+	static const uint16_t DEBOUNCE_TIME;
+	static uint16_t rotationCount;
 	static unsigned long debouncer;
+	static unsigned long lastMillis;
+	static unsigned long unchangedFor;
+	static const uint16_t UNCHANGED_FOR_TIME;
 	static void handleISR();
 	void init();
 	void free();
@@ -45,10 +49,13 @@ static const int SEQUENCE_LENGTH = 6;
 static const int BUTTON_COUNT = 4;
 class ButtonMatrix : public GameObject {
 private:
-	static unsigned long millisPulseStart[BUTTON_COUNT];
+	//static unsigned long millisPulseStart[BUTTON_COUNT];
 	static uint8_t shouldPulse[BUTTON_COUNT];
 	static unsigned long lastUpdate;
 public:
+	static const uint8_t ALLBUTTONMASK;
+	static bool canISR;
+	static const uint8_t REBOUND_TIME;
 	static const uint8_t PIN_BUTTONS[BUTTON_COUNT];
 	static const uint8_t PIN_BUTTONS_PWM[BUTTON_COUNT];
 	static const uint8_t CORRECT_SEQUENCE[SEQUENCE_LENGTH];
@@ -77,6 +84,9 @@ public:
 class Hangman : public GameObject {
 public:
 	static const uint8_t PIN_MAGNET;
+	static const uint16_t TIME_TO_BE_TAKEN;
+	unsigned int lastMillis;
+	unsigned int currentTimeTaken;
 	static const uint8_t PIN_BOOK_REED;
 	void init();
 	void free();
