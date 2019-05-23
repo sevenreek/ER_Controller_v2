@@ -39,7 +39,8 @@ void setup() {
 	coordinator->loadInterface(MEGASTATE_4_LoweredCoffin);
 	coordinator->loadInterface(MEGASTATE_5_UnlockedCoffin);
 	coordinator->loadInterface(MEGASTATE_6_SolvedCoffin);*/
-
+	//coordinator->loadInterface(MEGASTATE_7_TakenBook);
+	//gpio->devil.lightLed();
 	nanoComms->pushCommsCleaner();
 	//Serial.println("Succesfully started.");
 }

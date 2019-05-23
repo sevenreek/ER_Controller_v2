@@ -231,6 +231,7 @@ void GS6_SolvedCoffin::onEnd()
 }
 // END GS6_SolvedCoffin
 // GS7_TakenBook
+static const uint16_t LIGHTS_OFF_TIME = 5000; // time for which the spellrings turn off after the devil is discovered; max is (2^16-1) approx. 65000
 GS7_TakenBook::GS7_TakenBook(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 {
 	this->coordinator = coordinator;
@@ -265,7 +266,7 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 		}
 		else if (message->command == CMD_SPELL_CAST_CORRECTLY)
 		{
-			//Serial.println("Recieved spellcastcorrect");
+			Serial.println("Recieved spellcastcorrect");
 			switch (message->argument)
 			{
 
@@ -274,10 +275,13 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 				//Serial.println("Recieved first spell");
 				break;
 			case 1: // spell 1
-
+				
 				break;
 			case 2: // spell 2
 				gpio->devil.dropCurtain();
+				analogWrite(gpio->rings.PIN_RING_LARGE, 0);
+				analogWrite(gpio->rings.PIN_RING_SMALL, 0);
+				delay(LIGHTS_OFF_TIME);
 				break;
 			case 3: // spell 3
 				gpio->devil.beginMoveUp();
@@ -290,6 +294,8 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 }
 void GS7_TakenBook::onEnd()
 {
+	gpio->rings.free();
+	gpio->devil.free();
 	// probably get devil's arm back up or something
 }
 // END GS7_TakenBook
@@ -330,10 +336,22 @@ void GSR_RestoreRoom::onStart()
 {
 	Serial.println("Restoring room state!");
 	gpio->devil.beginMoveDown();
+	gpio->buttons.init();
+	gpio->hangman.init();
 }
 void GSR_RestoreRoom::onUpdate()
 {
-	Serial.println(digitalRead(gpio->hangman.PIN_BOOK_REED) == LOW ? "BOOK DETECTED" : "NO BOOK");
+	if (digitalRead(gpio->hangman.PIN_BOOK_REED) == LOW)
+	{
+		for (int i = 0; i < 4; i++)
+			analogWrite(gpio->buttons.PIN_BUTTONS_PWM[i], 100);
+	}
+	else
+	{
+		for (int i = 0; i < 4; i++)
+			analogWrite(gpio->buttons.PIN_BUTTONS_PWM[i], 0);
+	}
+	//Serial.println(digitalRead(gpio->hangman.PIN_BOOK_REED) == LOW ? "BOOK DETECTED" : "NO BOOK");
 }
 void GSR_RestoreRoom::onMessageRecieved(Message *  message)
 {
