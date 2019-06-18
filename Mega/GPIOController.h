@@ -75,6 +75,7 @@ public:
 	static void disableISR();
 	static void pulse(int button, uint8_t count);
 	static void pulseRotate();
+	static void clearSequence();
 	void pulseAll(uint8_t count);
 	bool isCorrect();
 	void updatePWMs();

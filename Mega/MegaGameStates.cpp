@@ -152,7 +152,7 @@ void GS4_LoweredCoffin::onUpdate()
 		{
 			gpio->buttons.pulseAll(3);
 			gpio->buttons.position = 0;
-			memset(gpio->buttons.sequence, 0, SEQUENCE_LENGTH * sizeof(uint8_t));
+			gpio->buttons.clearSequence();
 		}
 
 	}

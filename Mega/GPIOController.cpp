@@ -51,6 +51,8 @@ unsigned long Coffin::unchangedFor = 0;
 unsigned long Coffin::lastMillis = 0;
 void Coffin::init()
 {
+	rotationCount = 0;
+	unchangedFor = 0;
 	pinMode(PIN_CRANK_REED, INPUT_PULLUP);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_CRANK_REED), handleISR, FALLING);
 	unchangedFor = 0;
@@ -71,6 +73,7 @@ void Coffin::handleISR()
 void Coffin::free()
 {
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_CRANK_REED));
+	rotationCount = 0;
 }
 bool Coffin::isLowered()
 {
@@ -141,6 +144,7 @@ void ButtonMatrix::free()
 	{
 		analogWrite(PIN_BUTTONS_PWM[i], 0);
 	}
+	clearSequence();
 }
 bool ButtonMatrix::isCorrect()
 {
@@ -178,6 +182,10 @@ void ButtonMatrix::updatePWMs()
 		if(PINK && ALLBUTTONMASK == ALLBUTTONMASK) // if all buttons are high they can be pressed
 			canISR = true;
 	//}
+}
+void ButtonMatrix::clearSequence()
+{
+	memset(sequence, 0, SEQUENCE_LENGTH * sizeof(uint8_t));
 }
 void ButtonMatrix::pulse(int button, uint8_t count)
 {

@@ -97,6 +97,9 @@ void BoardCoordinator::onUpdate()
 					case CMD_RESTORE_ROOM:
 						loadInterface(MEGASTATE_R_RestoreRoom);
 						break;
+					case CMD_ZERO_STATE:
+						loadInterface(MEGASTATE_0_EnteredCells);
+						break;
 				}
 			}
 			else if (msg->type == MTYPE_EVENT)
