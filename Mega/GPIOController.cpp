@@ -373,10 +373,9 @@ const uint8_t SpellRings::PIN_RING_SMALL = 2; // PWM pin that controls the small
 const uint8_t SpellRings::PWM_LEVEL_LOW = 1; // PWM level for the default state of the ring(not pulsating)
 const uint8_t SpellRings::PWM_LEVEL_HIGH = 110; // base PWM state when the ring is pulsating
 const uint8_t SpellRings::PWM_LEVEL_PULSE = 100; // maximum deviation(amplitude) of brightness oscillation
-const uint8_t SpellRings::PULSE_COUNT = 12; // number of pulses to do in during PWM_PULSE_TIME
 const uint8_t SpellRings::PIN_RELAY = 28; // the pin that controlls the relay necessary to turn the LED strips on
 const uint8_t SpellRings::UPDATE_DELAY = 5; // delay between consecutive updates of LEDs brightness
-const unsigned int SpellRings::PWM_PULSE_TIME = 12000; // time for which to pulsate the LEDs once a correct spell is said
+const unsigned int SpellRings::PWM_PULSE_PERIOD = 1000; // the period of a single pulse in ~ms
 void SpellRings::init()
 {
 	pinMode(PIN_RELAY, OUTPUT);
@@ -404,11 +403,7 @@ void SpellRings::updatePWMs()
 	if (shouldPulse && (lastUpdate + UPDATE_DELAY) < millis())
 	{
 		unsigned long timeDiff = millis() - pulseStartMillis;
-		if (timeDiff > PWM_PULSE_TIME)
-		{
-			shouldPulse = false;
-		}
-		double trigVal = -cos( ( (double)timeDiff / (double)PWM_PULSE_TIME )*PULSE_COUNT * 2 * PI );
+		double trigVal = -cos( ( (double)timeDiff / (double)PWM_PULSE_PERIOD ) * 2 * PI );
 		uint8_t valShift = round(PWM_LEVEL_PULSE*trigVal);
 		analogWrite(PIN_RING_SMALL, PWM_LEVEL_HIGH + valShift);
 		analogWrite(PIN_RING_LARGE, PWM_LEVEL_HIGH + valShift);
@@ -416,8 +411,9 @@ void SpellRings::updatePWMs()
 	}
 	else if(!shouldPulse)
 	{
-		analogWrite(PIN_RING_SMALL, PWM_LEVEL_LOW);
-		analogWrite(PIN_RING_LARGE, PWM_LEVEL_LOW);
+		uint8_t glowLevel = shouldGlow ? PWM_LEVEL_LOW : 0;
+		analogWrite(PIN_RING_SMALL, glowLevel);
+		analogWrite(PIN_RING_LARGE, glowLevel);
 	}
 }
 void SpellRings::pulse()
@@ -425,12 +421,40 @@ void SpellRings::pulse()
 	pulseStartMillis = millis();
 	shouldPulse = true;
 }
+void SpellRings::stopPulse()
+{
+	shouldPulse = false;
+}
 void SpellRings::free()
 {
 	analogWrite(PIN_RING_SMALL, 0);
 	analogWrite(PIN_RING_LARGE, 0);
 }
+void SpellRings::enable()
+{
+	shouldGlow = true;
+}
+void SpellRings::kill()
+{
+	shouldGlow = false;
+}
 // END RING
+// FOGMACHINE
+void FogMachine::init()
+{
+	pinMode(PIN_FOG_RELAY, OUTPUT);
+	digitalWrite(PIN_FOG_RELAY, !PIN_FOG_ON_STATE);
+}
+void FogMachine::run(int time)
+{
+	digitalWrite(PIN_FOG_RELAY, PIN_FOG_ON_STATE);
+	delay(time);
+	digitalWrite(PIN_FOG_RELAY, !PIN_FOG_ON_STATE);
+}
+void FogMachine::free()
+{
+}
+// END FOGMACHINE
 // DEVIL
 const uint8_t Devil::PIN_POWER = 22; // pin controlling the relay that puts power to the devil engine
 const uint8_t Devil::PIN_PWM = 11; // pin that controlls the speed at which the engine moves(PWM)

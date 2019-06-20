@@ -54,6 +54,8 @@ public:
 	void onEnd();
 };
 class GS4_LoweredCoffin : public GameStateInterface {
+private:
+	bool glowButtons = false;
 public:
 	GS4_LoweredCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();

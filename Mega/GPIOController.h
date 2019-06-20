@@ -97,6 +97,7 @@ public:
 class SpellRings : public GameObject {
 private:
 	bool shouldPulse;
+	bool shouldGlow;
 	unsigned long lastUpdate;
 public:
 	static const uint8_t PIN_RELAY;
@@ -105,15 +106,26 @@ public:
 	static const uint8_t PWM_LEVEL_LOW;
 	static const uint8_t PWM_LEVEL_HIGH;
 	static const uint8_t PWM_LEVEL_PULSE;
-	static const uint8_t PULSE_COUNT;
+	//static const uint8_t PULSE_COUNT;
 	static const uint8_t UPDATE_DELAY;
-	static const unsigned int PWM_PULSE_TIME;
+	static const unsigned int PWM_PULSE_PERIOD;
 	unsigned long pulseStartMillis;
+	void stopPulse();
 	void init();
 	void free();
 	void dim();
 	void updatePWMs();
 	void pulse();
+	void kill();
+	void enable();
+};
+class FogMachine : public GameObject {
+public:
+	static const uint8_t PIN_FOG_RELAY = 35;
+	static const uint8_t PIN_FOG_ON_STATE = LOW;
+	void init();
+	void free();
+	void run(int time);
 };
 class Devil : public GameObject {
 public:
@@ -146,5 +158,6 @@ public:
 	ButtonMatrix buttons;
 	Hangman hangman;
 	SpellRings rings;
+	FogMachine fogmachine;
 	Devil devil;
 };

@@ -10,6 +10,7 @@ GS0_EnteredCells::GS0_EnteredCells(BoardCoordinator* coordinator, CommunicationC
 void GS0_EnteredCells::onStart()
 {
 	gpio->cells.init();
+	gpio->fogmachine.init();
 }
 void GS0_EnteredCells::onUpdate()
 {
@@ -108,7 +109,6 @@ void GS3_OpenedChest::onStart()
 }
 void GS3_OpenedChest::onUpdate()
 {
-
 	if (gpio->coffin.isLowered())
 	{
 		coordinator->loadNextInterface();
@@ -139,8 +139,8 @@ void GS4_LoweredCoffin::onStart()
 }
 void GS4_LoweredCoffin::onUpdate()
 {
-	
-	gpio->buttons.updatePWMs();
+	if(glowButtons)
+		gpio->buttons.updatePWMs();
 	if (gpio->buttons.position >= SEQUENCE_LENGTH)
 	{
 		if (gpio->buttons.isCorrect())
@@ -159,6 +159,8 @@ void GS4_LoweredCoffin::onUpdate()
 }
 void GS4_LoweredCoffin::onMessageRecieved(Message *  message)
 {
+	if (message->command == CMD_ENABLE_BUTTONS)
+		glowButtons = true;
 }
 void GS4_LoweredCoffin::onEnd()
 {
@@ -264,8 +266,25 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 		{
 			gpio->rings.pulse();
 		}
+		else if (message->command == CMD_SPELL_CAST_END)
+		{
+			gpio->rings.stopPulse();
+		}
+		else if (message->command = CMD_FOG_RUN)
+		{
+			gpio->fogmachine.run(message->argument);
+		}
+		else if (message->command == CMD_RINGS_KILL)
+		{
+
+		}
+		else if (message->command == CMD_RINGS_ENABLE)
+		{
+
+		}
 		else if (message->command == CMD_SPELL_CAST_CORRECTLY)
 		{
+			gpio->rings.stopPulse();
 			Serial.println("Recieved spellcastcorrect");
 			switch (message->argument)
 			{
