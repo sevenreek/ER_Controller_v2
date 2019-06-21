@@ -121,8 +121,8 @@ public:
 };
 class FogMachine : public GameObject {
 public:
-	static const uint8_t PIN_FOG_RELAY = 35;
-	static const uint8_t PIN_FOG_ON_STATE = LOW;
+	static const uint8_t PIN_FOG_RELAY;
+	static const uint8_t PIN_FOG_ON_STATE;
 	void init();
 	void free();
 	void run(int time);

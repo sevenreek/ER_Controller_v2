@@ -44,7 +44,7 @@ bool CommunicationController::hasMessage(Message * &message)
 		}
 		else if (pos < 3 && !isAlphaNumeric(readChar))
 		{
-			flushBuffer();
+			//flushBuffer();
 		}
 		else
 		{

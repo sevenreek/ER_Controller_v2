@@ -28,7 +28,7 @@ void setup() {
 	Serial.begin(9600);
 	ICSerial = new NeoICSerial();
 	ICSerial->begin(9600);
-	//Serial.println("Mega booting...");
+	Serial.println("Mega booting...");
 	nanoComms = new CommunicationController(ICSerial);
 	gpio = new GPIOController();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);

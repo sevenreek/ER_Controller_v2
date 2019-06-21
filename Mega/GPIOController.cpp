@@ -405,8 +405,9 @@ void SpellRings::updatePWMs()
 		unsigned long timeDiff = millis() - pulseStartMillis;
 		double trigVal = -cos( ( (double)timeDiff / (double)PWM_PULSE_PERIOD ) * 2 * PI );
 		uint8_t valShift = round(PWM_LEVEL_PULSE*trigVal);
-		analogWrite(PIN_RING_SMALL, PWM_LEVEL_HIGH + valShift);
-		analogWrite(PIN_RING_LARGE, PWM_LEVEL_HIGH + valShift);
+		uint8_t glowLevel = shouldGlow ? PWM_LEVEL_HIGH + valShift : 0;
+		analogWrite(PIN_RING_SMALL, glowLevel);
+		analogWrite(PIN_RING_LARGE, glowLevel);
 		lastUpdate = millis();
 	}
 	else if(!shouldPulse)
@@ -440,6 +441,8 @@ void SpellRings::kill()
 }
 // END RING
 // FOGMACHINE
+const uint8_t FogMachine::PIN_FOG_RELAY = 35;
+const uint8_t FogMachine::PIN_FOG_ON_STATE = LOW;
 void FogMachine::init()
 {
 	pinMode(PIN_FOG_RELAY, OUTPUT);

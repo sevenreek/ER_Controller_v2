@@ -27,6 +27,9 @@ void BoardCoordinator::loadInterface(int identifier)
 		break;
 		case MEGASTATE_1_LockedCells:
 			currentInterface = new GS1_LockedCells(this, comms, gpio, wireless);
+			currentInterface->onStart();
+			currentInterface->onStart();
+			currentInterface->onStart();
 		break;
 		case MEGASTATE_2_UnlockedCells:
 			currentInterface = new GS2_UnlockedCells(this, comms, gpio, wireless);
@@ -53,7 +56,7 @@ void BoardCoordinator::loadInterface(int identifier)
 			currentInterface = new GS_NoState(this, comms, gpio, wireless);
 		break;
 	}
-	currentInterface->onStart();
+	//currentInterface->onStart();
 }
 void BoardCoordinator::loadNextInterface()
 {
@@ -66,9 +69,10 @@ void BoardCoordinator::onUpdate()
 	{
 		if (msg->sender == SNDR_PC)
 		{
-			//Serial.println("PC sent something");
+			Serial.println("PC sent something");
 			if (msg->type == MTYPE_STATE)
 			{
+				Serial.print("PC sent "); Serial.println(msg->command);
 				switch (msg->command)
 				{
 					case CMD_NOSTATE: default:
@@ -101,21 +105,23 @@ void BoardCoordinator::onUpdate()
 						loadInterface(MEGASTATE_0_EnteredCells);
 						break;
 				}
+				initializeCurrentInterface();
 			}
 			else if (msg->type == MTYPE_EVENT)
 			{
-				
-				switch (msg->command)
+				if (currentInterface)
 				{
-					case CMD_NOEVENT: default:
-					break;
-					case CMD_SPELL_CAST_BEGIN:
-					case CMD_SPELL_CAST_CORRECTLY:
-						//Serial.print("pointer passed:");
-						//Serial.println((int)msg);
-						if(currentInterface)
-							currentInterface->onMessageRecieved(msg);
-					break;
+					if (msg->command == CMD_ACKNOWLEDGE_STATE_CHANGE && !initializedCurrentInterface)
+					{
+						initializeCurrentInterface();
+					}
+					else if (!initializedCurrentInterface);
+					else
+						currentInterface->onMessageRecieved(msg);
+				}
+				if (msg->command = CMD_FOG_RUN)
+				{
+					gpio->fogmachine.run(msg->argument);
 				}
 			}
 		}
@@ -128,6 +134,11 @@ void BoardCoordinator::onUpdate()
 	}
 	//Serial.print("Update coordinator");
 	//Serial.println((int)currentInterface);
-	if (currentInterface)
+	if (currentInterface && initializedCurrentInterface)
 		currentInterface->onUpdate();
+}
+void BoardCoordinator::initializeCurrentInterface()
+{
+	currentInterface->onStart();
+	initializedCurrentInterface = true;
 }
