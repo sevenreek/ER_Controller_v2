@@ -9,9 +9,11 @@ BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessCont
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
 	loadInterface(0);
+	initializeCurrentInterface();
 }
 void BoardCoordinator::loadInterface(int identifier)
 {
+	initializedCurrentInterface = false;
 	Serial.print("Loading interface ");
 	Serial.println(identifier);
 	if (currentInterface)
@@ -139,6 +141,7 @@ void BoardCoordinator::onUpdate()
 }
 void BoardCoordinator::initializeCurrentInterface()
 {
+	Serial.print("Initalizing "); Serial.print(currentInterfaceIndex);
 	currentInterface->onStart();
 	initializedCurrentInterface = true;
 }

@@ -18,7 +18,7 @@ void CommunicationController::pushCommsCleaner()
 }
 bool CommunicationController::hasMessage(Message * &message)
 {
-	if(pos > 0 && lastRecieved + MESSAGE_TIMEOUT < millis())
+	if(pos > 0 && ((lastRecieved + MESSAGE_TIMEOUT) < millis()))
 		flushBuffer();
 	while (stream->available())
 	{
@@ -41,10 +41,6 @@ bool CommunicationController::hasMessage(Message * &message)
 		else if (pos >= TOTAL_LENGTH)
 		{
 			flushBuffer();
-		}
-		else if (pos < 3 && !isAlphaNumeric(readChar))
-		{
-			//flushBuffer();
 		}
 		else
 		{
