@@ -38,6 +38,10 @@ bool CommunicationController::hasMessage(Message * &message)
 		{
 			flushBuffer();
 		}
+		else if (pos<3 && readChar < 0x30)
+		{
+			flushBuffer();
+		}
 		else if (pos >= TOTAL_LENGTH)
 		{
 			flushBuffer();

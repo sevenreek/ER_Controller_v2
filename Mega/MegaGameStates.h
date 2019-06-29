@@ -18,6 +18,7 @@ public:
 	GS_NoState(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
@@ -25,6 +26,7 @@ class GS0_EnteredCells : public GameStateInterface {
 public:
 	GS0_EnteredCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
+	void onInit();
 	void onStart();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
@@ -33,6 +35,7 @@ class GS1_LockedCells : public GameStateInterface {
 public:
 	GS1_LockedCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
+	void onInit();
 	void onStart();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
@@ -41,6 +44,7 @@ class GS2_UnlockedCells : public GameStateInterface {
 public:
 	GS2_UnlockedCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
+	void onInit();
 	void onStart();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
@@ -50,16 +54,16 @@ public:
 	GS3_OpenedChest(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
 class GS4_LoweredCoffin : public GameStateInterface {
-private:
-	bool glowButtons = false;
 public:
 	GS4_LoweredCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
@@ -68,6 +72,7 @@ public:
 	GS5_UnlockedCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
@@ -76,6 +81,7 @@ public:
 	GS6_SolvedCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
@@ -84,6 +90,7 @@ public:
 	GS7_TakenBook(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
@@ -92,6 +99,7 @@ public:
 	GSR_RestoreRoom(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
 	void onUpdate();
 	void onStart();
+	void onInit();
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };

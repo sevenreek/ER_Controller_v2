@@ -9,11 +9,11 @@ private:
 	WirelessController * wireless = NULL;
 	GPIOController * gpio = NULL;
 	unsigned int currentInterfaceIndex;
-	bool initializedCurrentInterface = false;
+	bool startedCurrentInterface = false;
 public:
 	BoardCoordinator(CommunicationController * comms, WirelessController * wireless, GPIOController * gpio);
 	void loadNextInterface();
-	void loadInterface(int indentifier);
+	void loadInterface(int indentifier, bool forceInit);
 	void onUpdate();
-	void initializeCurrentInterface();
+	void startCurrentInterface();
 };

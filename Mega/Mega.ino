@@ -33,6 +33,8 @@ void setup() {
 	gpio = new GPIOController();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
+	coordinator->loadInterface(0,true);
+	
 	/*coordinator->loadInterface(MEGASTATE_1_LockedCells);
 	coordinator->loadInterface(MEGASTATE_2_UnlockedCells);
 	coordinator->loadInterface(MEGASTATE_3_OpenedChest);

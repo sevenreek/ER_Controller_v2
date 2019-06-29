@@ -123,6 +123,7 @@ uint8_t ButtonMatrix::position = 0;
 unsigned long ButtonMatrix::buttonDebouncers[BUTTON_COUNT] = {0};
 void ButtonMatrix::init()
 {
+	clearSequence();
 	for (int i = 0; i < BUTTON_COUNT; i++)
 	{
 		pinMode(PIN_BUTTONS[i], INPUT_PULLUP);
@@ -186,6 +187,7 @@ void ButtonMatrix::updatePWMs()
 void ButtonMatrix::clearSequence()
 {
 	memset(sequence, 0, SEQUENCE_LENGTH * sizeof(uint8_t));
+	position = 0;
 }
 void ButtonMatrix::pulse(int button, uint8_t count)
 {
@@ -378,6 +380,8 @@ const uint8_t SpellRings::UPDATE_DELAY = 5; // delay between consecutive updates
 const unsigned int SpellRings::PWM_PULSE_PERIOD = 1000; // the period of a single pulse in ~ms
 void SpellRings::init()
 {
+	shouldGlow = true;
+	shouldPulse = false;
 	pinMode(PIN_RELAY, OUTPUT);
 	digitalWrite(PIN_RELAY, LOW);
 	pinMode(PIN_RING_LARGE, OUTPUT);
@@ -422,7 +426,7 @@ void SpellRings::pulse()
 	pulseStartMillis = millis();
 	shouldPulse = true;
 }
-void SpellRings::stopPulse()
+ void SpellRings::stopPulse()
 {
 	shouldPulse = false;
 }
