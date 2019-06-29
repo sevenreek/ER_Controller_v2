@@ -477,6 +477,8 @@ void GSR_RestoreRoom::onMessageRecieved(Message *  message)
 }
 void GSR_RestoreRoom::onEnd()
 {
-	
+	gpio->buttons.free();
+	gpio->devil.free();
+	gpio->hangman.free();
 }
 // END GSR_RestoreRoom
