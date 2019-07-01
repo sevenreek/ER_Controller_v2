@@ -31,6 +31,7 @@ void setup() {
 	Serial.println("Mega booting...");
 	nanoComms = new CommunicationController(ICSerial);
 	gpio = new GPIOController();
+	gpio->fogmachine.init();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
 	coordinator->loadInterface(0,true);
