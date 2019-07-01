@@ -118,9 +118,10 @@ void BoardCoordinator::onUpdate()
 					else
 						currentInterface->onMessageRecieved(msg);
 				}
-				if (msg->command = CMD_FOG_RUN)
+				if (msg->command == CMD_FOG_RUN)
 				{
-					gpio->fogmachine.run(msg->argument);
+					Serial.print("Running fogger for "); Serial.println(msg->argument);
+					gpio->fogmachine.run(msg->argument * gpio->fogmachine.ARGUMENT_TIME_MULTIPLIER); // mult by 100
 				}
 			}
 		}

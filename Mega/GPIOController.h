@@ -123,6 +123,7 @@ class FogMachine : public GameObject {
 public:
 	static const uint8_t PIN_FOG_RELAY;
 	static const uint8_t PIN_FOG_ON_STATE;
+	static const uint16_t ARGUMENT_TIME_MULTIPLIER;
 	void init();
 	void free();
 	void run(int time);

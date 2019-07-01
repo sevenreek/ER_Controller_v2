@@ -447,6 +447,7 @@ void SpellRings::kill()
 // FOGMACHINE
 const uint8_t FogMachine::PIN_FOG_RELAY = 37;
 const uint8_t FogMachine::PIN_FOG_ON_STATE = LOW;
+const uint16_t ARGUMENT_TIME_MULTIPLIER = 100;
 void FogMachine::init()
 {
 	pinMode(PIN_FOG_RELAY, OUTPUT);
