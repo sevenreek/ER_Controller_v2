@@ -39,12 +39,12 @@ bool Chest::isLocked()
 // END CHEST
 // COFFIN
 const uint8_t Coffin::PIN_CRANK_REED = A15; // pin of the reed switch of the crank that lowers the coffin;
-const uint16_t Coffin::ROTATIONS_TO_LOWER = 90; // rotation count that is considered as the coffin being surely lowered
-const uint16_t Coffin::ROTATIONS_TO_LOWER_POSSIBLE = 70; // rotation count at which the coffin might have been lowered; a timer is started if no more rotations occur
+const uint16_t Coffin::ROTATIONS_TO_LOWER = 80; // rotation count that is considered as the coffin being surely lowered
+const uint16_t Coffin::ROTATIONS_TO_LOWER_POSSIBLE = 60; // rotation count at which the coffin might have been lowered; a timer is started if no more rotations occur
 const uint16_t Coffin::DEBOUNCE_TIME = 250; // crank reed switch debounce time; this should probably set to the lowest time that a player is able to rotate the crank in
 											// after detecting a state change on the crank reed further changes occuring in this time will be ignored
 uint16_t Coffin::rotationCount = 0;
-const uint16_t Coffin::UNCHANGED_FOR_TIME = 4000; // when the ROTATIONS_TO_LOWER_POSSIBLE is exceeded and no more rotations occur during this time frame
+const uint16_t Coffin::UNCHANGED_FOR_TIME = 3000; // when the ROTATIONS_TO_LOWER_POSSIBLE is exceeded and no more rotations occur during this time frame
 												  // the coffin is considered to have been lowered and buttons are turned on
 unsigned long Coffin::debouncer = 0;
 unsigned long Coffin::unchangedFor = 0;
@@ -90,6 +90,7 @@ bool Coffin::isLowered()
 }
 bool Coffin::open(WirelessController * wireless)
 {
+	Serial.println("Unlocking coffin");
 	uint8_t command = CMD_COFFIN_UNLOCKED;
 	int arg = 0;
 	Message * m = new Message(SNDR_MEGA, MTYPE_EVENT, command, arg);
@@ -447,7 +448,7 @@ void SpellRings::kill()
 // FOGMACHINE
 const uint8_t FogMachine::PIN_FOG_RELAY = 37;
 const uint8_t FogMachine::PIN_FOG_ON_STATE = LOW;
-const uint16_t ARGUMENT_TIME_MULTIPLIER = 100;
+const uint16_t FogMachine::ARGUMENT_TIME_MULTIPLIER = 100;
 void FogMachine::init()
 {
 	pinMode(PIN_FOG_RELAY, OUTPUT);

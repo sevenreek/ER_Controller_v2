@@ -234,11 +234,9 @@ void GS5_UnlockedCoffin::onInit()
 }
 void GS5_UnlockedCoffin::onStart()
 {
-
-	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_UNLOCKED, 0);
-	wireless->sendMessage(m, WirelessController::REPEAT_COUNT);
-	delete m;
-
+	
+	gpio->coffin.open(wireless);
+	Message* m;
 	m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_UNLOCKED, 1);
 	comms->sendMessage(m);
 	delete m;
