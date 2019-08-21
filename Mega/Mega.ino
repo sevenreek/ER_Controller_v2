@@ -43,7 +43,7 @@ void setup() {
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
 	coordinator->loadInterface(0,true);
 	//Serial.print("RAM LEFT:");Serial.println(freeRam());
-	//coordinator->loadInterface(MEGASTATE_5_UnlockedCoffin, true);
+	//coordinator->loadInterface(MEGASTATE_R_RestoreRoom, true);
 	nanoComms->pushCommsCleaner();
 }
 

@@ -451,6 +451,7 @@ void GSR_RestoreRoom::onInit()
 void GSR_RestoreRoom::onStart()
 {
 	Serial.println("Restoring room state!");
+  gpio->devil.init();
 	gpio->devil.beginMoveDown();
 	gpio->buttons.init();
 	gpio->hangman.init();

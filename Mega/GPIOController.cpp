@@ -478,6 +478,7 @@ const uint8_t Devil::PIN_LED_PWM = 8; // this is actually a relay now, so use di
 const uint8_t Devil::PIN_LED_PWM_ON_LEVEL = 255; // the led pin is no longer PWM so this has to be 255; see above
 void Devil::init()
 {
+  
 	pinMode(PIN_CURTAIN, OUTPUT);
 	pinMode(PIN_LED_PWM, OUTPUT);
 	//analogWrite(PIN_LED_PWM, 0);
@@ -489,20 +490,29 @@ void Devil::init()
 	pinMode(PIN_LSWITCH_ARM_HIGH, INPUT_PULLUP);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_LOW), handleArmDownISR, RISING);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_HIGH), handleArmUpISR, FALLING);
+
+  digitalWrite(PIN_POWER,LOW);
 }
 void Devil::beginMoveUp()
 {
 	if (digitalRead(PIN_LSWITCH_ARM_HIGH) == LOW)
+  {
+    Serial.println("Cannot begin move.");
 		return;
+  }
 	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, HIGH);
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
 }
 void Devil::beginMoveDown()
 {
+  Serial.println("starting arm movement");
 	if (digitalRead(PIN_LSWITCH_ARM_LOW) == HIGH)
-		return;
-	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	{
+    Serial.println("Cannot begin move.");
+    return;
+  }
+  analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
 	digitalWrite(PIN_ARM_GO_LOW, HIGH);
 }
@@ -521,7 +531,7 @@ void Devil::handleArmUpISR()
 {
 	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
-	//digitalWrite(PIN_ARM_GO_LOW, LOW);
+	//digitalWrite(PIN_ARM_GO_LOW, LOW); // it is possible to trigger this isr due to bounce when going down
 }
 void Devil::handleArmDownISR()
 {
