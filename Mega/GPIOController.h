@@ -53,6 +53,7 @@ private:
 	static uint8_t shouldPulse[BUTTON_COUNT];
 	static unsigned long lastUpdate;
 public:
+	static void addSequenceElement(uint8_t element);
 	static const uint8_t ALLBUTTONMASK;
 	static bool canISR;
 	static const uint8_t REBOUND_TIME;

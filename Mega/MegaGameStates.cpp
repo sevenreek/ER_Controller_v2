@@ -191,20 +191,10 @@ void GS4_LoweredCoffin::onStart()
 void GS4_LoweredCoffin::onUpdate()
 {	
 	gpio->buttons.updatePWMs();
-	if (gpio->buttons.position >= SEQUENCE_LENGTH)
+	if (gpio->buttons.isCorrect())
 	{
-		if (gpio->buttons.isCorrect())
-		{
-			gpio->buttons.pulseRotate();
-			coordinator->loadNextInterface(); // coffin is unlocked when the next state loads.
-		}
-		else
-		{
-			gpio->buttons.pulseAll(3);
-			//gpio->buttons.position = 0;
-			gpio->buttons.clearSequence();
-		}
-
+		gpio->buttons.pulseRotate();
+		coordinator->loadNextInterface(); // coffin is unlocked when the next state loads.
 	}
 }
 void GS4_LoweredCoffin::onMessageRecieved(Message *  message)

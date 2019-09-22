@@ -136,6 +136,14 @@ void ButtonMatrix::init()
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[2]), handleISR2, FALLING);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[3]), handleISR3, FALLING);
 }
+void ButtonMatrix::addSequenceElement(uint8_t element)
+{
+	for (int i = 0; i < SEQUENCE_LENGTH - 1; i++)
+	{
+		sequence[i] = sequence[i + 1];
+	}
+	sequence[SEQUENCE_LENGTH - 1] = element;
+}
 void ButtonMatrix::free()
 {
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[0]));
@@ -245,7 +253,7 @@ void ButtonMatrix::handleISR0()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 1;
+			addSequenceElement(1);
 			pulse(0,1);
 		}
 	}
@@ -269,7 +277,7 @@ void ButtonMatrix::handleISR1()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 2;
+			addSequenceElement(2);
 			pulse(1,1);
 		}
 		
@@ -295,7 +303,7 @@ void ButtonMatrix::handleISR2()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 3;
+			addSequenceElement(3);
 			pulse(2,1);
 		}
 		
@@ -319,7 +327,7 @@ void ButtonMatrix::handleISR3()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 4;
+			addSequenceElement(4);
 			pulse(3,1);
 		}
 	}
