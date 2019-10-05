@@ -6,10 +6,13 @@
 *.user
 *.userosscache
 *.sln.docstates
+
+Mega/Mega/__vm/*
 Mega/Mega/__vm/Compile.vmps.xml
 Mega/Mega/__vm/Configuration.Release.vmps.xml
 Mega/Mega/__vm/Configuration.Debug.vmps.xml
 Mega/Mega/__vm/Upload.vmps.xml
+
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -48,7 +51,8 @@ dlldata.c
 project.lock.json
 project.fragment.lock.json
 artifacts/
-
+*.vcxproj
+*.filters
 *_i.c
 *_p.c
 *_i.h

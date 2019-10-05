@@ -24,25 +24,27 @@ CommunicationController * nanoComms = NULL;
 WirelessController * wireless = NULL;
 NeoICSerial * ICSerial = NULL;
 GPIOController * gpio = NULL;
+int freeRam();
+int freeRam() {
+	extern int __heap_start, * __brkval;
+	int v;
+	return (int)& v - (__brkval == 0 ? (int)& __heap_start : (int)__brkval);
+}
+
 void setup() {
 	Serial.begin(9600);
 	ICSerial = new NeoICSerial();
 	ICSerial->begin(9600);
-	//Serial.println("Mega booting...");
+	Serial.println("Mega booting...");
 	nanoComms = new CommunicationController(ICSerial);
 	gpio = new GPIOController();
+	gpio->fogmachine.init();
 	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
-	/*coordinator->loadInterface(MEGASTATE_1_LockedCells);
-	coordinator->loadInterface(MEGASTATE_2_UnlockedCells);
-	coordinator->loadInterface(MEGASTATE_3_OpenedChest);
-	coordinator->loadInterface(MEGASTATE_4_LoweredCoffin);
-	coordinator->loadInterface(MEGASTATE_5_UnlockedCoffin);
-	coordinator->loadInterface(MEGASTATE_6_SolvedCoffin);*/
-	//coordinator->loadInterface(MEGASTATE_7_TakenBook);
-	//gpio->devil.lightLed();
+	coordinator->loadInterface(0,true);
+	//Serial.print("RAM LEFT:");Serial.println(freeRam());
+	//coordinator->loadInterface(MEGASTATE_R_RestoreRoom, true);
 	nanoComms->pushCommsCleaner();
-	//Serial.println("Succesfully started.");
 }
 
 // the loop function runs over and over again until power down or reset

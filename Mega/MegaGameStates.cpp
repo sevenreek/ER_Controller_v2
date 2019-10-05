@@ -2,14 +2,28 @@
 // GS0_EnteredCells
 GS0_EnteredCells::GS0_EnteredCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 {
+
 	this->coordinator = coordinator;
 	this->comms = comms;
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
+void GS0_EnteredCells::onInit()
+{
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_ZERO_STATE, 0);
+	comms->sendMessage(m);
+	delete m;
+}
 void GS0_EnteredCells::onStart()
 {
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_ZERO_STATE, 1);
+	comms->sendMessage(m);
+	delete m;
 	gpio->cells.init();
+	gpio->fogmachine.init();
+	
 }
 void GS0_EnteredCells::onUpdate()
 {
@@ -30,17 +44,26 @@ void GS0_EnteredCells::onEnd()
 // GS1_LockedCells
 GS1_LockedCells::GS1_LockedCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 {
+
 	this->coordinator = coordinator;
 	this->comms = comms;
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
-void GS1_LockedCells::onStart()
+void GS1_LockedCells::onInit()
 {
+
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_LOCKED, 0);
 	comms->sendMessage(m);
 	delete m;
+}	
+void GS1_LockedCells::onStart()
+{
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_LOCKED, 1 );
+	comms->sendMessage(m);
+	delete m;
 	gpio->chest.init();
+
 }
 void GS1_LockedCells::onUpdate()
 {
@@ -50,7 +73,7 @@ void GS1_LockedCells::onUpdate()
 	}
 	if (!gpio->chest.isLocked())
 	{
-		coordinator->loadInterface(MEGASTATE_3_OpenedChest);
+		coordinator->loadInterface(MEGASTATE_3_OpenedChest, false);
 	}
 }
 void GS1_LockedCells::onMessageRecieved(Message *  message)
@@ -64,14 +87,24 @@ void GS1_LockedCells::onEnd()
 // GS2_UnlockedCells
 GS2_UnlockedCells::GS2_UnlockedCells(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 {
+
+	
 	this->coordinator = coordinator;
 	this->comms = comms;
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
-void GS2_UnlockedCells::onStart()
+
+void GS2_UnlockedCells::onInit()
 {
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_UNLOCKED, 0);
+	comms->sendMessage(m);
+	delete m;
+
+}
+void GS2_UnlockedCells::onStart()
+{
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CELLS_UNLOCKED, 1 );
 	comms->sendMessage(m);
 	delete m;
 	
@@ -98,17 +131,27 @@ GS3_OpenedChest::GS3_OpenedChest(BoardCoordinator* coordinator, CommunicationCon
 	this->comms = comms;
 	this->gpio = gpio;
 	this->wireless = wireless;
+	
 }
-void GS3_OpenedChest::onStart()
+
+void GS3_OpenedChest::onInit()
 {
+
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CHEST_UNLOCKED, 0);
 	comms->sendMessage(m);
 	delete m;
+}
+void GS3_OpenedChest::onStart()
+{
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CHEST_UNLOCKED, 1 );
+	comms->sendMessage(m);
+	delete m;
 	gpio->coffin.init();
+
 }
 void GS3_OpenedChest::onUpdate()
 {
-
 	if (gpio->coffin.isLowered())
 	{
 		coordinator->loadNextInterface();
@@ -130,35 +173,33 @@ GS4_LoweredCoffin::GS4_LoweredCoffin(BoardCoordinator* coordinator, Communicatio
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
-void GS4_LoweredCoffin::onStart()
+
+void GS4_LoweredCoffin::onInit()
 {
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_LOWERED, 0);
 	comms->sendMessage(m);
 	delete m;
+}
+void GS4_LoweredCoffin::onStart()
+{
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_LOWERED,  1);
+	comms->sendMessage(m);
+	delete m;
 	gpio->buttons.init();
+
 }
 void GS4_LoweredCoffin::onUpdate()
-{
-	
+{	
 	gpio->buttons.updatePWMs();
-	if (gpio->buttons.position >= SEQUENCE_LENGTH)
+	if (gpio->buttons.isCorrect())
 	{
-		if (gpio->buttons.isCorrect())
-		{
-			gpio->buttons.pulseRotate();
-			coordinator->loadNextInterface(); // coffin is unlocked when the next state loads.
-		}
-		else
-		{
-			gpio->buttons.pulseAll(3);
-			gpio->buttons.position = 0;
-			memset(gpio->buttons.sequence, 0, SEQUENCE_LENGTH * sizeof(uint8_t));
-		}
-
+		gpio->buttons.pulseRotate();
+		coordinator->loadNextInterface(); // coffin is unlocked when the next state loads.
 	}
 }
 void GS4_LoweredCoffin::onMessageRecieved(Message *  message)
 {
+
 }
 void GS4_LoweredCoffin::onEnd()
 {
@@ -173,14 +214,24 @@ GS5_UnlockedCoffin::GS5_UnlockedCoffin(BoardCoordinator* coordinator, Communicat
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
+
+void GS5_UnlockedCoffin::onInit()
+{
+	Message *  m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_UNLOCKED, 0);
+	comms->sendMessage(m);
+	delete m;
+
+}
 void GS5_UnlockedCoffin::onStart()
 {
-	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_UNLOCKED, 0);
-
+	
+	gpio->coffin.open(wireless);
+	Message* m;
+	m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_UNLOCKED, 1);
 	comms->sendMessage(m);
-	wireless->sendMessage(m, WirelessController::REPEAT_COUNT);
-
 	delete m;
+
+
 }
 void GS5_UnlockedCoffin::onUpdate()
 {
@@ -207,13 +258,23 @@ GS6_SolvedCoffin::GS6_SolvedCoffin(BoardCoordinator* coordinator, CommunicationC
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
+
+void GS6_SolvedCoffin::onInit()
+{
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_COMPLETED, 0);
+	comms->sendMessage(m);
+	delete m;
+}
 void GS6_SolvedCoffin::onStart()
 {
-	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_COMPLETED, 0);
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_COFFIN_COMPLETED, 1 );
 	comms->sendMessage(m);
 	delete m;
 	gpio->hangman.init();
 	gpio->hangman.drop();
+
 }
 void GS6_SolvedCoffin::onUpdate()
 {
@@ -239,13 +300,23 @@ GS7_TakenBook::GS7_TakenBook(BoardCoordinator* coordinator, CommunicationControl
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
+
+void GS7_TakenBook::onInit()
+{
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_BOOK_TAKEN, 0);
+	comms->sendMessage(m);
+	delete m;
+}
 void GS7_TakenBook::onStart()
 {
-	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_BOOK_TAKEN, 0);
+
+	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_BOOK_TAKEN, 1 );
 	comms->sendMessage(m);
 	delete m;
 	gpio->rings.init();
 	gpio->devil.init();
+	gpio->rings.enable();
 }
 void GS7_TakenBook::onUpdate()
 {
@@ -253,42 +324,68 @@ void GS7_TakenBook::onUpdate()
 }
 void GS7_TakenBook::onMessageRecieved(Message *  message)
 {
-	//Serial.println("Recieved message");
+	Serial.println("Recieved message in 7");
 	//Serial.print("pointer recieved:");
 	//Serial.println((int)message);
 	if (message->sender == SNDR_PC && message->type == MTYPE_EVENT)
 	{
-		//Serial.println("Event coming from PC recognized.");
-		//Serial.print("Command is "); Serial.println(message->command);
-		if (message->command == CMD_SPELL_CAST_BEGIN)
+		Serial.println("Event coming from PC recognized.");
+		Serial.print("Command is "); Serial.println(message->command);
+		switch (message->command)
 		{
-			gpio->rings.pulse();
-		}
-		else if (message->command == CMD_SPELL_CAST_CORRECTLY)
-		{
-			Serial.println("Recieved spellcastcorrect");
-			switch (message->argument)
+		case CMD_SPELL_CAST_BEGIN:
 			{
-
-			case 0: // spell 0 no need to send sounds as the message is sourced from PC
-				gpio->devil.lightLed();
-				//Serial.println("Recieved first spell");
-				break;
-			case 1: // spell 1
-				
-				break;
-			case 2: // spell 2
-				gpio->devil.dropCurtain();
-				analogWrite(gpio->rings.PIN_RING_LARGE, 0);
-				analogWrite(gpio->rings.PIN_RING_SMALL, 0);
-				delay(LIGHTS_OFF_TIME);
-				break;
-			case 3: // spell 3
-				gpio->devil.beginMoveUp();
-				break;
-
-			default:break;
+				gpio->rings.pulse();
 			}
+			break;
+		case CMD_SPELL_CAST_END:
+			{
+				gpio->rings.stopPulse();
+			}
+			break;
+		case CMD_FOG_RUN:
+			{
+				gpio->fogmachine.run(message->argument);
+			}
+			break;
+		case CMD_RINGS_KILL:
+			{
+				gpio->rings.kill();
+			}
+			break;
+		case CMD_RINGS_ENABLE:
+			{
+				gpio->rings.enable();
+			}
+			break;
+		case CMD_SPELL_CAST_CORRECTLY:
+			{
+				gpio->rings.stopPulse();
+				gpio->rings.kill();
+				Serial.println("Recieved spellcastcorrect");
+				switch (message->argument)
+				{
+
+				case 0: // spell 0 no need to send sounds as the message is sourced from PC
+					gpio->devil.lightLed();
+					//Serial.println("Recieved first spell");
+					break;
+				case 1: // spell 1
+
+					break;
+				case 2: // spell 2
+					gpio->devil.dropCurtain();
+					break;
+				case 3: // spell 3
+					gpio->devil.beginMoveUp();
+					break;
+
+				default:break;
+				}
+			}
+			break;
+		default:
+			Serial.println("Command not recognized");
 		}
 	}
 }
@@ -306,6 +403,11 @@ GS_NoState::GS_NoState(BoardCoordinator* coordinator, CommunicationController* c
 	this->comms = comms;
 	this->gpio = gpio;
 	this->wireless = wireless;
+}
+
+void GS_NoState::onInit()
+{
+	Serial.println("ERROR: NoState started!");
 }
 void GS_NoState::onStart()
 {
@@ -332,9 +434,14 @@ GSR_RestoreRoom::GSR_RestoreRoom(BoardCoordinator* coordinator, CommunicationCon
 	this->gpio = gpio;
 	this->wireless = wireless;
 }
+
+void GSR_RestoreRoom::onInit()
+{
+}
 void GSR_RestoreRoom::onStart()
 {
 	Serial.println("Restoring room state!");
+  gpio->devil.init();
 	gpio->devil.beginMoveDown();
 	gpio->buttons.init();
 	gpio->hangman.init();
@@ -359,6 +466,8 @@ void GSR_RestoreRoom::onMessageRecieved(Message *  message)
 }
 void GSR_RestoreRoom::onEnd()
 {
-	
+	gpio->buttons.free();
+	gpio->devil.free();
+	gpio->hangman.free();
 }
 // END GSR_RestoreRoom

@@ -53,6 +53,7 @@ private:
 	static uint8_t shouldPulse[BUTTON_COUNT];
 	static unsigned long lastUpdate;
 public:
+	static void addSequenceElement(uint8_t element);
 	static const uint8_t ALLBUTTONMASK;
 	static bool canISR;
 	static const uint8_t REBOUND_TIME;
@@ -75,6 +76,7 @@ public:
 	static void disableISR();
 	static void pulse(int button, uint8_t count);
 	static void pulseRotate();
+	static void clearSequence();
 	void pulseAll(uint8_t count);
 	bool isCorrect();
 	void updatePWMs();
@@ -96,6 +98,7 @@ public:
 class SpellRings : public GameObject {
 private:
 	bool shouldPulse;
+	bool shouldGlow;
 	unsigned long lastUpdate;
 public:
 	static const uint8_t PIN_RELAY;
@@ -104,15 +107,27 @@ public:
 	static const uint8_t PWM_LEVEL_LOW;
 	static const uint8_t PWM_LEVEL_HIGH;
 	static const uint8_t PWM_LEVEL_PULSE;
-	static const uint8_t PULSE_COUNT;
+	//static const uint8_t PULSE_COUNT;
 	static const uint8_t UPDATE_DELAY;
-	static const unsigned int PWM_PULSE_TIME;
+	static const unsigned int PWM_PULSE_PERIOD;
 	unsigned long pulseStartMillis;
+	void stopPulse();
 	void init();
 	void free();
 	void dim();
 	void updatePWMs();
 	void pulse();
+	void kill();
+	void enable();
+};
+class FogMachine : public GameObject {
+public:
+	static const uint8_t PIN_FOG_RELAY;
+	static const uint8_t PIN_FOG_ON_STATE;
+	static const uint16_t ARGUMENT_TIME_MULTIPLIER;
+	void init();
+	void free();
+	void run(int time);
 };
 class Devil : public GameObject {
 public:
@@ -145,5 +160,6 @@ public:
 	ButtonMatrix buttons;
 	Hangman hangman;
 	SpellRings rings;
+	FogMachine fogmachine;
 	Devil devil;
 };

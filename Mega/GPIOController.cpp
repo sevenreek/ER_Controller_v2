@@ -39,18 +39,20 @@ bool Chest::isLocked()
 // END CHEST
 // COFFIN
 const uint8_t Coffin::PIN_CRANK_REED = A15; // pin of the reed switch of the crank that lowers the coffin;
-const uint16_t Coffin::ROTATIONS_TO_LOWER = 90; // rotation count that is considered as the coffin being surely lowered
-const uint16_t Coffin::ROTATIONS_TO_LOWER_POSSIBLE = 70; // rotation count at which the coffin might have been lowered; a timer is started if no more rotations occur
+const uint16_t Coffin::ROTATIONS_TO_LOWER = 80; // rotation count that is considered as the coffin being surely lowered
+const uint16_t Coffin::ROTATIONS_TO_LOWER_POSSIBLE = 60; // rotation count at which the coffin might have been lowered; a timer is started if no more rotations occur
 const uint16_t Coffin::DEBOUNCE_TIME = 250; // crank reed switch debounce time; this should probably set to the lowest time that a player is able to rotate the crank in
 											// after detecting a state change on the crank reed further changes occuring in this time will be ignored
 uint16_t Coffin::rotationCount = 0;
-const uint16_t Coffin::UNCHANGED_FOR_TIME = 4000; // when the ROTATIONS_TO_LOWER_POSSIBLE is exceeded and no more rotations occur during this time frame
+const uint16_t Coffin::UNCHANGED_FOR_TIME = 3000; // when the ROTATIONS_TO_LOWER_POSSIBLE is exceeded and no more rotations occur during this time frame
 												  // the coffin is considered to have been lowered and buttons are turned on
 unsigned long Coffin::debouncer = 0;
 unsigned long Coffin::unchangedFor = 0;
 unsigned long Coffin::lastMillis = 0;
 void Coffin::init()
 {
+	rotationCount = 0;
+	unchangedFor = 0;
 	pinMode(PIN_CRANK_REED, INPUT_PULLUP);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_CRANK_REED), handleISR, FALLING);
 	unchangedFor = 0;
@@ -71,6 +73,7 @@ void Coffin::handleISR()
 void Coffin::free()
 {
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_CRANK_REED));
+	rotationCount = 0;
 }
 bool Coffin::isLowered()
 {
@@ -87,6 +90,7 @@ bool Coffin::isLowered()
 }
 bool Coffin::open(WirelessController * wireless)
 {
+	Serial.println("Unlocking coffin");
 	uint8_t command = CMD_COFFIN_UNLOCKED;
 	int arg = 0;
 	Message * m = new Message(SNDR_MEGA, MTYPE_EVENT, command, arg);
@@ -120,6 +124,7 @@ uint8_t ButtonMatrix::position = 0;
 unsigned long ButtonMatrix::buttonDebouncers[BUTTON_COUNT] = {0};
 void ButtonMatrix::init()
 {
+	clearSequence();
 	for (int i = 0; i < BUTTON_COUNT; i++)
 	{
 		pinMode(PIN_BUTTONS[i], INPUT_PULLUP);
@@ -131,6 +136,14 @@ void ButtonMatrix::init()
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[2]), handleISR2, FALLING);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[3]), handleISR3, FALLING);
 }
+void ButtonMatrix::addSequenceElement(uint8_t element)
+{
+	for (int i = 0; i < SEQUENCE_LENGTH - 1; i++)
+	{
+		sequence[i] = sequence[i + 1];
+	}
+	sequence[SEQUENCE_LENGTH - 1] = element;
+}
 void ButtonMatrix::free()
 {
 	detachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_BUTTONS[0]));
@@ -141,6 +154,7 @@ void ButtonMatrix::free()
 	{
 		analogWrite(PIN_BUTTONS_PWM[i], 0);
 	}
+	clearSequence();
 }
 bool ButtonMatrix::isCorrect()
 {
@@ -178,6 +192,11 @@ void ButtonMatrix::updatePWMs()
 		if(PINK && ALLBUTTONMASK == ALLBUTTONMASK) // if all buttons are high they can be pressed
 			canISR = true;
 	//}
+}
+void ButtonMatrix::clearSequence()
+{
+	memset(sequence, 0, SEQUENCE_LENGTH * sizeof(uint8_t));
+	position = 0;
 }
 void ButtonMatrix::pulse(int button, uint8_t count)
 {
@@ -234,7 +253,7 @@ void ButtonMatrix::handleISR0()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 1;
+			addSequenceElement(1);
 			pulse(0,1);
 		}
 	}
@@ -258,7 +277,7 @@ void ButtonMatrix::handleISR1()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 2;
+			addSequenceElement(2);
 			pulse(1,1);
 		}
 		
@@ -284,7 +303,7 @@ void ButtonMatrix::handleISR2()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 3;
+			addSequenceElement(3);
 			pulse(2,1);
 		}
 		
@@ -308,7 +327,7 @@ void ButtonMatrix::handleISR3()
 		
 		if (position < SEQUENCE_LENGTH)
 		{
-			sequence[position++] = 4;
+			addSequenceElement(4);
 			pulse(3,1);
 		}
 	}
@@ -365,12 +384,13 @@ const uint8_t SpellRings::PIN_RING_SMALL = 2; // PWM pin that controls the small
 const uint8_t SpellRings::PWM_LEVEL_LOW = 1; // PWM level for the default state of the ring(not pulsating)
 const uint8_t SpellRings::PWM_LEVEL_HIGH = 110; // base PWM state when the ring is pulsating
 const uint8_t SpellRings::PWM_LEVEL_PULSE = 100; // maximum deviation(amplitude) of brightness oscillation
-const uint8_t SpellRings::PULSE_COUNT = 12; // number of pulses to do in during PWM_PULSE_TIME
 const uint8_t SpellRings::PIN_RELAY = 28; // the pin that controlls the relay necessary to turn the LED strips on
 const uint8_t SpellRings::UPDATE_DELAY = 5; // delay between consecutive updates of LEDs brightness
-const unsigned int SpellRings::PWM_PULSE_TIME = 12000; // time for which to pulsate the LEDs once a correct spell is said
+const unsigned int SpellRings::PWM_PULSE_PERIOD = 1000; // the period of a single pulse in ~ms
 void SpellRings::init()
 {
+	shouldGlow = true;
+	shouldPulse = false;
 	pinMode(PIN_RELAY, OUTPUT);
 	digitalWrite(PIN_RELAY, LOW);
 	pinMode(PIN_RING_LARGE, OUTPUT);
@@ -396,20 +416,18 @@ void SpellRings::updatePWMs()
 	if (shouldPulse && (lastUpdate + UPDATE_DELAY) < millis())
 	{
 		unsigned long timeDiff = millis() - pulseStartMillis;
-		if (timeDiff > PWM_PULSE_TIME)
-		{
-			shouldPulse = false;
-		}
-		double trigVal = -cos( ( (double)timeDiff / (double)PWM_PULSE_TIME )*PULSE_COUNT * 2 * PI );
+		double trigVal = -cos( ( (double)timeDiff / (double)PWM_PULSE_PERIOD ) * 2 * PI );
 		uint8_t valShift = round(PWM_LEVEL_PULSE*trigVal);
-		analogWrite(PIN_RING_SMALL, PWM_LEVEL_HIGH + valShift);
-		analogWrite(PIN_RING_LARGE, PWM_LEVEL_HIGH + valShift);
+		uint8_t glowLevel = shouldGlow ? PWM_LEVEL_HIGH + valShift : 0;
+		analogWrite(PIN_RING_SMALL, glowLevel);
+		analogWrite(PIN_RING_LARGE, glowLevel);
 		lastUpdate = millis();
 	}
 	else if(!shouldPulse)
 	{
-		analogWrite(PIN_RING_SMALL, PWM_LEVEL_LOW);
-		analogWrite(PIN_RING_LARGE, PWM_LEVEL_LOW);
+		uint8_t glowLevel = shouldGlow ? PWM_LEVEL_LOW : 0;
+		analogWrite(PIN_RING_SMALL, glowLevel);
+		analogWrite(PIN_RING_LARGE, glowLevel);
 	}
 }
 void SpellRings::pulse()
@@ -417,12 +435,43 @@ void SpellRings::pulse()
 	pulseStartMillis = millis();
 	shouldPulse = true;
 }
+ void SpellRings::stopPulse()
+{
+	shouldPulse = false;
+}
 void SpellRings::free()
 {
 	analogWrite(PIN_RING_SMALL, 0);
 	analogWrite(PIN_RING_LARGE, 0);
 }
+void SpellRings::enable()
+{
+	shouldGlow = true;
+}
+void SpellRings::kill()
+{
+	shouldGlow = false;
+}
 // END RING
+// FOGMACHINE
+const uint8_t FogMachine::PIN_FOG_RELAY = 37;
+const uint8_t FogMachine::PIN_FOG_ON_STATE = LOW;
+const uint16_t FogMachine::ARGUMENT_TIME_MULTIPLIER = 100;
+void FogMachine::init()
+{
+	pinMode(PIN_FOG_RELAY, OUTPUT);
+	digitalWrite(PIN_FOG_RELAY, !PIN_FOG_ON_STATE);
+}
+void FogMachine::run(int time)
+{
+	digitalWrite(PIN_FOG_RELAY, PIN_FOG_ON_STATE);
+	delay(time);
+	digitalWrite(PIN_FOG_RELAY, !PIN_FOG_ON_STATE);
+}
+void FogMachine::free()
+{
+}
+// END FOGMACHINE
 // DEVIL
 const uint8_t Devil::PIN_POWER = 22; // pin controlling the relay that puts power to the devil engine
 const uint8_t Devil::PIN_PWM = 11; // pin that controlls the speed at which the engine moves(PWM)
@@ -437,6 +486,7 @@ const uint8_t Devil::PIN_LED_PWM = 8; // this is actually a relay now, so use di
 const uint8_t Devil::PIN_LED_PWM_ON_LEVEL = 255; // the led pin is no longer PWM so this has to be 255; see above
 void Devil::init()
 {
+  
 	pinMode(PIN_CURTAIN, OUTPUT);
 	pinMode(PIN_LED_PWM, OUTPUT);
 	//analogWrite(PIN_LED_PWM, 0);
@@ -448,20 +498,29 @@ void Devil::init()
 	pinMode(PIN_LSWITCH_ARM_HIGH, INPUT_PULLUP);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_LOW), handleArmDownISR, RISING);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_HIGH), handleArmUpISR, FALLING);
+
+  digitalWrite(PIN_POWER,LOW);
 }
 void Devil::beginMoveUp()
 {
 	if (digitalRead(PIN_LSWITCH_ARM_HIGH) == LOW)
+  {
+    Serial.println("Cannot begin move.");
 		return;
+  }
 	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, HIGH);
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
 }
 void Devil::beginMoveDown()
 {
+  Serial.println("starting arm movement");
 	if (digitalRead(PIN_LSWITCH_ARM_LOW) == HIGH)
-		return;
-	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	{
+    Serial.println("Cannot begin move.");
+    return;
+  }
+  analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
 	digitalWrite(PIN_ARM_GO_LOW, HIGH);
 }
@@ -480,7 +539,7 @@ void Devil::handleArmUpISR()
 {
 	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
-	//digitalWrite(PIN_ARM_GO_LOW, LOW);
+	//digitalWrite(PIN_ARM_GO_LOW, LOW); // it is possible to trigger this isr due to bounce when going down
 }
 void Devil::handleArmDownISR()
 {

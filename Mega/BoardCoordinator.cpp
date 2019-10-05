@@ -8,10 +8,10 @@ BoardCoordinator::BoardCoordinator(CommunicationController * comms, WirelessCont
 	this->wireless = wireless;
 	this->gpio = gpio;
 	currentInterfaceIndex = 0;
-	loadInterface(0);
 }
-void BoardCoordinator::loadInterface(int identifier)
+void BoardCoordinator::loadInterface(int identifier, bool forceStart)
 {
+	startedCurrentInterface = forceStart;
 	Serial.print("Loading interface ");
 	Serial.println(identifier);
 	if (currentInterface)
@@ -53,11 +53,13 @@ void BoardCoordinator::loadInterface(int identifier)
 			currentInterface = new GS_NoState(this, comms, gpio, wireless);
 		break;
 	}
-	currentInterface->onStart();
+	currentInterface->onInit();
+	if(forceStart)
+		currentInterface->onStart();
 }
 void BoardCoordinator::loadNextInterface()
 {
-	loadInterface(currentInterfaceIndex+1);
+	loadInterface(currentInterfaceIndex+1, false);
 }
 void BoardCoordinator::onUpdate()
 {
@@ -66,53 +68,60 @@ void BoardCoordinator::onUpdate()
 	{
 		if (msg->sender == SNDR_PC)
 		{
-			//Serial.println("PC sent something");
+			Serial.println("PC sent something");
 			if (msg->type == MTYPE_STATE)
 			{
+				Serial.print("PC sent "); Serial.println(msg->command);
 				switch (msg->command)
 				{
 					case CMD_NOSTATE: default:
 					break;
 					case CMD_CELLS_LOCKED:
-						loadInterface(MEGASTATE_1_LockedCells);
+						loadInterface(MEGASTATE_1_LockedCells,true);
 					break;
 					case CMD_CELLS_UNLOCKED:
-						loadInterface(MEGASTATE_2_UnlockedCells);
+						loadInterface(MEGASTATE_2_UnlockedCells,true);
 						break;
 					case CMD_CHEST_UNLOCKED:
-						loadInterface(MEGASTATE_3_OpenedChest);
+						loadInterface(MEGASTATE_3_OpenedChest,true);
 						break;
 					case CMD_COFFIN_LOWERED:
-						loadInterface(MEGASTATE_4_LoweredCoffin);
+						loadInterface(MEGASTATE_4_LoweredCoffin,true);
 						break;
 					case CMD_COFFIN_UNLOCKED:
-						loadInterface(MEGASTATE_5_UnlockedCoffin);
+						loadInterface(MEGASTATE_5_UnlockedCoffin,true);
 						break;
 					case CMD_COFFIN_COMPLETED: case CMD_HANGMAN_DOWN:
-						loadInterface(MEGASTATE_6_SolvedCoffin);
+						loadInterface(MEGASTATE_6_SolvedCoffin,true);
 						break;
 					case CMD_BOOK_TAKEN:
-						loadInterface(MEGASTATE_7_TakenBook);
+						loadInterface(MEGASTATE_7_TakenBook,true);
 						break;
 					case CMD_RESTORE_ROOM:
-						loadInterface(MEGASTATE_R_RestoreRoom);
+						loadInterface(MEGASTATE_R_RestoreRoom,true);
+						break;
+					case CMD_ZERO_STATE:
+						loadInterface(MEGASTATE_0_EnteredCells,true);
 						break;
 				}
+				startCurrentInterface();
 			}
 			else if (msg->type == MTYPE_EVENT)
 			{
-				
-				switch (msg->command)
+				if (currentInterface)
 				{
-					case CMD_NOEVENT: default:
-					break;
-					case CMD_SPELL_CAST_BEGIN:
-					case CMD_SPELL_CAST_CORRECTLY:
-						//Serial.print("pointer passed:");
-						//Serial.println((int)msg);
-						if(currentInterface)
-							currentInterface->onMessageRecieved(msg);
-					break;
+					if (msg->command == CMD_ACKNOWLEDGE_STATE_CHANGE && !startedCurrentInterface)
+					{
+						startCurrentInterface();
+					}
+					else if (!startedCurrentInterface);
+					else
+						currentInterface->onMessageRecieved(msg);
+				}
+				if (msg->command == CMD_FOG_RUN)
+				{
+					Serial.print("Running fogger for "); Serial.println(msg->argument);
+					gpio->fogmachine.run(msg->argument * gpio->fogmachine.ARGUMENT_TIME_MULTIPLIER); // mult by 100
 				}
 			}
 		}
@@ -125,6 +134,12 @@ void BoardCoordinator::onUpdate()
 	}
 	//Serial.print("Update coordinator");
 	//Serial.println((int)currentInterface);
-	if (currentInterface)
+	if (currentInterface && startedCurrentInterface)
 		currentInterface->onUpdate();
+}
+void BoardCoordinator::startCurrentInterface()
+{
+	Serial.print("Starting "); Serial.print(currentInterfaceIndex);
+	currentInterface->onStart();
+	startedCurrentInterface = true;
 }

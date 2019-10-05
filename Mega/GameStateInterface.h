@@ -12,6 +12,7 @@ protected:
 	WirelessController * wireless;
 public:
 	virtual void onUpdate() = 0;
+	virtual void onInit() = 0;
 	virtual void onStart() = 0;
 	virtual void onEnd() = 0;
 	virtual void onMessageRecieved(Message *  message) = 0;

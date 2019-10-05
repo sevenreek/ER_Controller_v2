@@ -1,4 +1,5 @@
 <VisualMicro>
+
   <Program Name="Mega" Ext=".ino" Location="C:\Users\Dickbutt\source\repos\Mega\Mega">
     <Compile ReCompileIfSourceIsNewer="1" IsDebugStart="1" IsGdb="0" CompilerErrors="0" ConfigurationName="Release" UseConfigurationNameInBuildFolder="True" StopOnError="False" OptimiseLibs="True" OptimiseCore="True" BuildPath="C:\Users\Dickbutt\AppData\Local\Temp\VMBuilds\Mega\mega_atmega2560\Release" IncludeDebug="0" IncludesDebug="0" SketchName="Mega" IsCompiled="1" />
     <Platform Name="arduino16x" Package="arduino" Platform="avr" Architecture="avr">
