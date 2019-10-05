@@ -63,17 +63,21 @@ void GS1_LockedCells::onStart()
 	comms->sendMessage(m);
 	delete m;
 	gpio->chest.init();
-
+	gpio->coffin.init();
 }
 void GS1_LockedCells::onUpdate()
 {
 	if (gpio->cells.areUnlocked())
 	{
 		coordinator->loadNextInterface();
-	}
+	}/*
 	if (!gpio->chest.isLocked())
 	{
 		coordinator->loadInterface(MEGASTATE_3_OpenedChest, false);
+	}*/
+	if (gpio->coffin.isLowered())
+	{
+		coordinator->loadInterface(MEGASTATE_4_LoweredCoffin, false);
 	}
 }
 void GS1_LockedCells::onMessageRecieved(Message *  message)
@@ -111,9 +115,15 @@ void GS2_UnlockedCells::onStart()
 }
 void GS2_UnlockedCells::onUpdate()
 {
+	/*
 	if (!gpio->chest.isLocked())
 	{
 		coordinator->loadNextInterface();
+	}
+	*/
+	if (gpio->coffin.isLowered())
+	{
+		coordinator->loadInterface(MEGASTATE_4_LoweredCoffin, false);
 	}
 }
 void GS2_UnlockedCells::onMessageRecieved(Message *  message)
@@ -125,6 +135,7 @@ void GS2_UnlockedCells::onEnd()
 }
 // END GS2_UnlockedCells
 // GS3_OpenedChest
+
 GS3_OpenedChest::GS3_OpenedChest(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
 {
 	this->coordinator = coordinator;
@@ -147,7 +158,7 @@ void GS3_OpenedChest::onStart()
 	Message* m = new Message(SNDR_MEGA, MTYPE_STATE, CMD_CHEST_UNLOCKED, 1 );
 	comms->sendMessage(m);
 	delete m;
-	gpio->coffin.init();
+	
 
 }
 void GS3_OpenedChest::onUpdate()
@@ -164,6 +175,7 @@ void GS3_OpenedChest::onEnd()
 {
 	gpio->coffin.free(); // this will be triggered once coffin is lowered so we do not it monitored anymore
 }
+
 // END GS3_OpenedChest
 // GS4_LoweredCoffin
 GS4_LoweredCoffin::GS4_LoweredCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless)
