@@ -14,7 +14,7 @@ void Cells::free()
 bool Cells::areLocked()
 {
 	//Serial.print(digitalRead(PIN_CELL0));Serial.println(digitalRead(PIN_CELL1));
-	return (digitalRead(PIN_CELL0) == LOW && digitalRead(PIN_CELL1) == LOW);
+	return (digitalRead(PIN_CELL0) == LOW || digitalRead(PIN_CELL1) == LOW);
 }
 bool Cells::areUnlocked()
 {
