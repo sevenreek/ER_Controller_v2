@@ -547,6 +547,11 @@ void Devil::handleArmDownISR()
 	//digitalWrite(PIN_ARM_GO_UP, LOW);
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
 }
+void Devil::killAll()
+{
+	beginMoveDown();
+	digitalWrite(PIN_LED_PWM, LOW);
+}
 void Devil::free()
 {
 	digitalWrite(PIN_ARM_GO_LOW, LOW);

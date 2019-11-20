@@ -149,6 +149,7 @@ public:
 	void dropCurtain();
 	static void handleArmDownISR();
 	static void handleArmUpISR();
+	void killAll();
 	void free();
 };
 

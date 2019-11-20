@@ -123,6 +123,10 @@ void BoardCoordinator::onUpdate()
 					Serial.print("Running fogger for "); Serial.println(msg->argument);
 					gpio->fogmachine.run(msg->argument * gpio->fogmachine.ARGUMENT_TIME_MULTIPLIER); // mult by 100
 				}
+				else if (msg->command == CMD_DEVIL_OFF)
+				{
+					gpio->devil.killAll();
+				}
 			}
 		}
 		delete msg;
