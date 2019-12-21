@@ -451,10 +451,12 @@ void SpellRings::pulse()
 {
 	pulseStartMillis = millis();
 	shouldPulse = true;
+	//Serial.println("Pulse begin");
 }
  void SpellRings::stopPulse()
 {
 	shouldPulse = false;
+	//Serial.println("Pulse end");
 }
 void SpellRings::free()
 {
@@ -566,6 +568,7 @@ void Devil::handleArmDownISR()
 }
 void Devil::killAll()
 {
+	//Serial.println("Undeviling");
 	beginMoveDown();
 	digitalWrite(PIN_LED_PWM, LOW);
 }
