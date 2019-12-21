@@ -3,6 +3,7 @@
 #include "WirelessController.h"
 #include <PinChangeInterrupt.h>
 
+#define CONFIG_CELL_DOUBLE_CHECK_LOCK true
 class GameObject {
 public: 
 	virtual void init() = 0;
@@ -12,6 +13,10 @@ class Cells : public GameObject{
 private:
 	const static uint8_t PIN_CELL0;
 	const static uint8_t PIN_CELL1;
+#if CONFIG_CELL_DOUBLE_CHECK_LOCK == true
+	const static uint8_t DOUBLE_CHECK_COUNT;
+	const static uint8_t DOUBLE_CHECK_DELAY;
+#endif
 public:
 	void init();
 	void free();
@@ -149,6 +154,7 @@ public:
 	void dropCurtain();
 	static void handleArmDownISR();
 	static void handleArmUpISR();
+	void killAll();
 	void free();
 };
 

@@ -49,6 +49,7 @@ public:
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
+
 class GS3_OpenedChest : public GameStateInterface {
 public:
 	GS3_OpenedChest(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
@@ -58,6 +59,7 @@ public:
 	void onMessageRecieved(Message *  message);
 	void onEnd();
 };
+
 class GS4_LoweredCoffin : public GameStateInterface {
 public:
 	GS4_LoweredCoffin(BoardCoordinator* coordinator, CommunicationController* comms, GPIOController* gpio, WirelessController* wireless);
