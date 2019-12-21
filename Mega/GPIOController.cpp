@@ -2,6 +2,10 @@
 // CELLS
 const uint8_t Cells::PIN_CELL0 = A9; // pin of the reed switch of the cell door(probably left); reed grounds the pin when closed
 const uint8_t Cells::PIN_CELL1 = A8; // pin of the reed switch of the cell door(probably right); reed grounds the pin when closed
+#if CONFIG_CELL_DOUBLE_CHECK_LOCK == true
+const uint8_t Cells::DOUBLE_CHECK_COUNT = 3;
+const uint8_t Cells::DOUBLE_CHECK_DELAY = 33;
+#endif
 void Cells::init()
 {
 	pinMode(PIN_CELL0, INPUT_PULLUP);
@@ -13,8 +17,21 @@ void Cells::free()
 }
 bool Cells::areLocked()
 {
-	//Serial.print(digitalRead(PIN_CELL0));Serial.println(digitalRead(PIN_CELL1));
+#if CONFIG_CELL_DOUBLE_CHECK_LOCK == true
+	bool isLocked = true;
+	for (int i = 0; i < DOUBLE_CHECK_COUNT; i++)
+	{
+		if (!(digitalRead(PIN_CELL0) == LOW || digitalRead(PIN_CELL1) == LOW))
+		{
+			isLocked = false;
+			break;
+		}
+		delay(DOUBLE_CHECK_DELAY);
+	}
+	return isLocked;
+#else
 	return (digitalRead(PIN_CELL0) == LOW || digitalRead(PIN_CELL1) == LOW);
+#endif
 }
 bool Cells::areUnlocked()
 {
