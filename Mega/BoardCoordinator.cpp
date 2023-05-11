@@ -68,10 +68,10 @@ void BoardCoordinator::onUpdate()
 	{
 		if (msg->sender == SNDR_PC)
 		{
-			Serial.println("PC sent something");
+			//Serial.println("PC sent something");
 			if (msg->type == MTYPE_STATE)
 			{
-				Serial.print("PC sent "); Serial.println(msg->command);
+				//Serial.print("PC sent "); Serial.println(msg->command);
 				switch (msg->command)
 				{
 					case CMD_NOSTATE: default:

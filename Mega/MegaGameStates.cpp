@@ -255,6 +255,7 @@ void GS5_UnlockedCoffin::onMessageRecieved(Message *  message)
 	{
 		coordinator->loadNextInterface();
 	}
+	Serial.println("Got message");
 
 }
 void GS5_UnlockedCoffin::onEnd()
@@ -389,6 +390,7 @@ void GS7_TakenBook::onMessageRecieved(Message *  message)
 					gpio->devil.dropCurtain();
 					break;
 				case 3: // spell 3
+					Serial.println("Spell cast to move up.");
 					gpio->devil.beginMoveUp();
 					break;
 

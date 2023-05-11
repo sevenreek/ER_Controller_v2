@@ -9,16 +9,13 @@
 
 #include <NeoICSerial.h>
 
-#include <RH_ASK.h>
 #include <SPI.h>
 #include <PinChangeInterrupt.h>
 #include "BoardCoordinator.h"
 
 const static uint16_t RF_SPEED = 2000;
-const static uint8_t RF_RX = 52;
-const static uint8_t RF_TX = 53;
-const static uint8_t RF_PTT = 10;
-const static bool RF_PTT_INV = false;
+const static uint8_t RF_CE = 49;
+const static uint8_t RF_CS = 53;
 BoardCoordinator * coordinator = NULL;
 CommunicationController * nanoComms = NULL;
 WirelessController * wireless = NULL;
@@ -39,11 +36,10 @@ void setup() {
 	nanoComms = new CommunicationController(ICSerial);
 	gpio = new GPIOController();
 	gpio->fogmachine.init();
-	wireless = new WirelessController(RF_SPEED, RF_RX, RF_TX, RF_PTT, RF_PTT_INV);
+	wireless = new WirelessController(RF_CE, RF_CS);
 	coordinator = new BoardCoordinator(nanoComms, wireless, gpio);
 	coordinator->loadInterface(0,true);
-	//Serial.print("RAM LEFT:");Serial.println(freeRam());
-	//coordinator->loadInterface(MEGASTATE_R_RestoreRoom, true);
+	//coordinator->loadInterface(MEGASTATE_5_UnlockedCoffin, true);
 	nanoComms->pushCommsCleaner();
 }
 

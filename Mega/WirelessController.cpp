@@ -1,45 +1,41 @@
 #include "WirelessController.h"
 
-WirelessController::WirelessController(int speed, int rx, int tx, int ptt, bool ptt_inv)
+const uint8_t WirelessController::MEGA_ADDRESS[5] = "mega";
+const uint8_t WirelessController::COFFIN_ADDRESS[5] = "cffn";
+WirelessController::WirelessController(int cePin, int csPin)
 {
-	driver = new RH_ASK(speed, rx, tx, ptt, ptt_inv);
-	//Serial.print("Initialized with ");Serial.print(speed);
-	//Serial.print(rx);Serial.print(tx);Serial.println(ptt);
-	driver->init();
+	driver = new RF24(cePin, csPin);
+	driver->begin();
+	driver->setPALevel(RF24_PA_LOW);
+	driver->setAddressWidth(4);
+	driver->setPayloadSize(TOTAL_LENGTH);
+	driver->setRetries(15, 15);
+	driver->openWritingPipe(WirelessController::COFFIN_ADDRESS);
+	driver->openReadingPipe(1, WirelessController::MEGA_ADDRESS);
+	driver->startListening();
 }
 void WirelessController::sendMessage(Message *m, int repeatCount)
 {
 	uint8_t * mes = Message::toByteArray(m);
-	for (int i = 0; i < TOTAL_LENGTH - 1; i++)
-	{
-		Serial.print(mes[i]);Serial.print(" ");
-	}
-	//Serial.print("Sending:");
-	//Serial.println((char*)mes);
-	uint8_t len = TOTAL_LENGTH-1;
-	while (repeatCount--)
-	{
-		//Serial.print("Called send...");
-		driver->send(mes,len);
-		driver->waitPacketSent();
-	}
+	Serial.println("Sending wireless");
+	driver->stopListening();
+	do {
+		driver->write(mes, TOTAL_LENGTH);
+	} while(--repeatCount > 0);
+	driver->startListening();
 	delete[] mes;
 }
 bool WirelessController::hasMessage(Message *&m)
 {
 	uint8_t buffer[TOTAL_LENGTH];
 	uint8_t len = TOTAL_LENGTH;
-	if ( driver->recv(buffer, &len) )
+	uint8_t pipe;
+	if (driver->available(&pipe))
 	{
-		
-		if (len == TOTAL_LENGTH-1)
-		{
-			//Serial.println(len);
-			m = Message::fromByteArray(buffer);
-			return true;
-		}
-		else
-			return false;
+		Serial.println("Got wireless");
+		driver->read(&buffer, len);
+		m = Message::fromByteArray(buffer);
+		return true;
 	}
 	else 
 		return false;

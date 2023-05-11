@@ -19,11 +19,13 @@ bool Cells::areLocked()
 {
 #if CONFIG_CELL_DOUBLE_CHECK_LOCK == true
 	bool isLocked = true;
+	int states[2] = {digitalRead(PIN_CELL0), digitalRead(PIN_CELL1)};
 	for (int i = 0; i < DOUBLE_CHECK_COUNT; i++)
 	{
-		if (!(digitalRead(PIN_CELL0) == LOW || digitalRead(PIN_CELL1) == LOW))
+		if (!(states[0] == LOW || states[1] == LOW))
 		{
 			isLocked = false;
+			//Serial.println("Is locked");
 			break;
 		}
 		delay(DOUBLE_CHECK_DELAY);
@@ -111,7 +113,7 @@ bool Coffin::open(WirelessController * wireless)
 	uint8_t command = CMD_COFFIN_UNLOCKED;
 	int arg = 0;
 	Message * m = new Message(SNDR_MEGA, MTYPE_EVENT, command, arg);
-	wireless->sendMessage(m, WirelessController::REPEAT_COUNT);
+	wireless->sendMessage(m);
 	delete m;
 }
 // END COFFIN
@@ -494,7 +496,7 @@ void FogMachine::free()
 // DEVIL
 const uint8_t Devil::PIN_POWER = 22; // pin controlling the relay that puts power to the devil engine
 const uint8_t Devil::PIN_PWM = 11; // pin that controlls the speed at which the engine moves(PWM)
-const uint8_t Devil::PWM_LEVEL_HIGH = 200; // the PWM level to which set PIN_PWM when moving the arm; max is 255
+const uint8_t Devil::PWM_LEVEL_HIGH = 100; // the PWM level to which set PIN_PWM when moving the arm; max is 255
 const uint8_t Devil::PWM_LEVEL_LOW = 0; // PWM level to which set PIN_PWM when not moving; should probably be 0
 const uint8_t Devil::PIN_LSWITCH_ARM_LOW = 12; // the pin that changes state when the arm is fully lowered
 const uint8_t Devil::PIN_LSWITCH_ARM_HIGH = 13; // the pin that changes state when the arm is fully raised
@@ -506,6 +508,8 @@ const uint8_t Devil::PIN_LED_PWM_ON_LEVEL = 255; // the led pin is no longer PWM
 void Devil::init()
 {
   
+  
+  Serial.println("Devil init");
 	pinMode(PIN_CURTAIN, OUTPUT);
 	pinMode(PIN_LED_PWM, OUTPUT);
 	//analogWrite(PIN_LED_PWM, 0);
@@ -518,28 +522,30 @@ void Devil::init()
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_LOW), handleArmDownISR, RISING);
 	attachPinChangeInterrupt(digitalPinToPinChangeInterrupt(PIN_LSWITCH_ARM_HIGH), handleArmUpISR, FALLING);
 
-  digitalWrite(PIN_POWER,LOW);
+	digitalWrite(PIN_POWER,LOW);
 }
 void Devil::beginMoveUp()
 {
+	Serial.println("Moving up");
 	if (digitalRead(PIN_LSWITCH_ARM_HIGH) == LOW)
-  {
-    Serial.println("Cannot begin move.");
-		return;
-  }
-	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	{
+		Serial.println("Cannot begin move.");
+			return;
+	}
+	digitalWrite(PIN_PWM, HIGH);
 	digitalWrite(PIN_ARM_GO_UP, HIGH);
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
+	//Serial.println("Moving up proc donzo");
 }
 void Devil::beginMoveDown()
 {
-  Serial.println("starting arm movement");
+  Serial.println("Moving down");
 	if (digitalRead(PIN_LSWITCH_ARM_LOW) == HIGH)
 	{
     Serial.println("Cannot begin move.");
     return;
   }
-  analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	digitalWrite(PIN_PWM, HIGH);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
 	digitalWrite(PIN_ARM_GO_LOW, HIGH);
 }
@@ -556,19 +562,21 @@ void Devil::dropCurtain()
 }
 void Devil::handleArmUpISR()
 {
-	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	//Serial.println("Arm is up");
+	//digitalWrite(PIN_PWM, LOW);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
 	//digitalWrite(PIN_ARM_GO_LOW, LOW); // it is possible to trigger this isr due to bounce when going down
 }
 void Devil::handleArmDownISR()
 {
-	analogWrite(PIN_PWM, PWM_LEVEL_HIGH);
+	//Serial.println("Arm is down");
+	//digitalWrite(PIN_PWM, LOW);
 	//digitalWrite(PIN_ARM_GO_UP, LOW);
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
 }
 void Devil::killAll()
 {
-	//Serial.println("Undeviling");
+	Serial.println("Undeviling");
 	beginMoveDown();
 	digitalWrite(PIN_LED_PWM, LOW);
 }
@@ -576,7 +584,7 @@ void Devil::free()
 {
 	digitalWrite(PIN_ARM_GO_LOW, LOW);
 	digitalWrite(PIN_ARM_GO_UP, LOW);
-	analogWrite(PIN_PWM, 0);
+	digitalWrite(PIN_PWM, LOW);
 	digitalWrite(PIN_LED_PWM, LOW);
 	//beginMoveUp();
 }
